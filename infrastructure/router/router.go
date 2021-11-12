@@ -2,16 +2,16 @@ package router
 
 import (
 	"WizelineApi/interface/controller"
+	//"academy-go-q42021/interface/controller"
 	"log"
 	"net/http"
 	"github.com/gorilla/mux"
 	"fmt"
 )
 
+
+
 func NewRouter() {
-
-	
-
 	r := mux.NewRouter()
 
 	handler_pkm := controller.NewPokemonController()
