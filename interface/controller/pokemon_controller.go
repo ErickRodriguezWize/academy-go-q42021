@@ -2,10 +2,12 @@ package controller
 
 import (
 	"net/http"
-	"fmt"
+	//"fmt"
+	//"errors"
 	"github.com/gorilla/mux"
 	"encoding/json"
 	"WizelineApi/domain/model"
+	"WizelineApi/service"
 	"strconv"
 )
 
@@ -17,26 +19,21 @@ type PokemonController interface{
 	GetPokemon()
 }
 
-pokemon_controller = pokemonController{}
+
 
 func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.Request)  {
-	
-	//leer csv
-	// generar array del csv
-
 	pokemons := []model.Pokemon{
 		{1, "Bulbasaur"},
 		{2, "Ivysaur"},
 		{3, "Venasaur"},
-	}
+	}	
 
-	jsonR, jsonErr := json.Marshal(pokemons)
-	
-	if jsonErr != nil {
-		fmt.Println("Json unable to encode")
-	}
+	//leer csv
+	// generar array del csv
 
-	res.Write(jsonR)
+	res.Header().Set("Content-Type", "application/json")
+	res.WriteHeader(http.StatusOK)
+	json.NewEncoder(res).Encode(pokemons)
 }
 
 func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Request) {
@@ -44,43 +41,49 @@ func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 		{1, "Bulbasaur"},
 		{2, "Ivysaur"},
 		{3, "Venasaur"},
-	}
+	}	
 
-	var t_pkm model.Pokemon
+	pkm := model.Pokemon{}
+
 	params := mux.Vars(req)
 	id,err := strconv.Atoi(params["id"])
-
 	if err != nil {
-		fmt.Println("Couldn't parse to Integer")
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusBadRequest)
+		res.Write([]byte(err.Error()))
+		return
 	}
 
-	for _,pk := range pokemons{
-		if pk.ID == id {
-			t_pkm = pk
-			break
-		}
+	pkm, err = service.GetPokemonById(pokemons, id)
+	if err != nil {
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusOK)
+		res.Write([]byte(err.Error()))
+		return
 	}
 
-	jsonR, _ := json.Marshal(t_pkm)
-
+	//jsonR, _ := json.Marshal(pkm)
+	
 	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
-	res.Write(jsonR)
-
-}
-
-func renderResponse(*res http.ResponseWriter, err Error, json interface{}){
-	res.Header.Set("Content-Type", "application/json")
-	if err != nil {
-		res.WriteHedear(http.BadRequest)
-		res.Write(err)
-	}else{
-		res.WriteHeader(http.StatusOK)
-		res.Writer(json)
-	}
-
+	//res.Write(jsonR)
+	json.NewEncoder(res).Encode(pkm)
+	return
 }
 
 func NewPokemonController() *pokemonController{
 	return &pokemonController{}
 }
+
+/*
+func renderResponse(res *http.ResponseWriter, err error, json interface{}){
+	res.Header().Set("Content-Type", "application/json")
+	if err != nil{
+		res.WriteHeader(http.StatusBadRequest)
+		res.Writer([]byte("Something Went Wrong!!"))
+	}else{
+		res.Writeheader(http.StatusOK)
+		res.Writer(json)
+	}
+}
+*/
