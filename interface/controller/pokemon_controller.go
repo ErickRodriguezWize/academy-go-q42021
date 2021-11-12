@@ -22,11 +22,15 @@ type PokemonController interface{
 
 
 func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.Request)  {
-	pokemons := []model.Pokemon{
-		{1, "Bulbasaur"},
-		{2, "Ivysaur"},
-		{3, "Venasaur"},
-	}	
+	
+	pokemons := []model.Pokemon{}
+	err := service.ReadCSV("./test/bateria_csv/pokemon.csv", &pokemons)
+
+	if err != nil {
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusBadRequest)
+		res.Write([]byte(err.Error()))
+	}
 
 	//leer csv
 	// generar array del csv
@@ -37,10 +41,13 @@ func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 }
 
 func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Request) {
-	pokemons := []model.Pokemon{
-		{1, "Bulbasaur"},
-		{2, "Ivysaur"},
-		{3, "Venasaur"},
+	pokemons := []model.Pokemon{}
+	err := service.ReadCSV("./test/bateria_csv/pokemon.csv", &pokemons)
+
+	if err != nil {
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusBadRequest)
+		res.Write([]byte(err.Error()))
 	}	
 
 	pkm := model.Pokemon{}
@@ -68,7 +75,6 @@ func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 	res.WriteHeader(http.StatusOK)
 	//res.Write(jsonR)
 	json.NewEncoder(res).Encode(pkm)
-	return
 }
 
 func NewPokemonController() *pokemonController{
