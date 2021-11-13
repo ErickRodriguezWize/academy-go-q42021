@@ -57,7 +57,7 @@ func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 	if err != nil {
 		res.Header().Set("Content-Type", "application/json")
 		res.WriteHeader(http.StatusBadRequest)
-		res.Write([]byte(err.Error()))
+		res.Write([]byte("Couldn't Parse properly to Integer."))
 		return
 	}
 

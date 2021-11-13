@@ -50,3 +50,14 @@ TODO
 4. Investigar redundancia a al hora de importar el mismo paquete en archivos diferentes. 
 ```
 
+
+Test
+```Test
+Run Server: go run main.go 
+
+Test Endpoint pokemons: 
+- curl -v 'http://localhost:8000/pokemons'
+
+Test endpoint pokemon/{id}
+- curl -v 'http://localhost:8000/pokemon/122'
+```
