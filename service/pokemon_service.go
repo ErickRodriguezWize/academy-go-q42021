@@ -5,6 +5,7 @@ import (
 	"errors"
 )
 
+//Servicio utilizado para buscar por ID dentro de un slice del modelod e Pokemon
 func GetPokemonById(pokemons []model.Pokemon, id int) (model.Pokemon, error){
 	t_pkm := model.Pokemon{}
 

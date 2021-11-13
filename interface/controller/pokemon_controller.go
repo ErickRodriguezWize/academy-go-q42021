@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-
+//Structura vacia del controlador. 
 type pokemonController struct{}
 
 type PokemonController interface{
@@ -77,11 +77,15 @@ func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 	json.NewEncoder(res).Encode(pkm)
 }
 
+//Funcion para obtener una structura vacia del Controlador a la hora de llamarla por paquete. 
 func NewPokemonController() *pokemonController{
 	return &pokemonController{}
 }
 
 /*
+
+Codigo a reutilziar 
+
 func renderResponse(res *http.ResponseWriter, err error, json interface{}){
 	res.Header().Set("Content-Type", "application/json")
 	if err != nil{
