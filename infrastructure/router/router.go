@@ -1,12 +1,13 @@
 package router
 
 import (
-	"WizelineApi/interface/controller"
-	//"academy-go-q42021/interface/controller"
 	"log"
 	"net/http"
-	"github.com/gorilla/mux"
 	"fmt"
+
+	"github.com/ErickRodriguezWize/academy-go-q42021/interface/controller"
+
+	"github.com/gorilla/mux"
 )
 
 
@@ -14,10 +15,10 @@ import (
 func NewRouter() {
 	r := mux.NewRouter()
 
-	handler_pkm := controller.NewPokemonController()
+	pokemonHandler := controller.NewPokemonController()
 	//Pokemon Endpoints
-	r.HandleFunc("/pokemons", handler_pkm.GetAllPokemons).Methods("GET")
-	r.HandleFunc("/pokemon/{id}", handler_pkm.GetPokemon).Methods("GET")
+	r.HandleFunc("/pokemons", pokemonHandler.GetAllPokemons).Methods("GET")
+	r.HandleFunc("/pokemons/{id}", pokemonHandler.GetPokemon).Methods("GET")
 
 	//Server setup
 	srv := &http.Server{
