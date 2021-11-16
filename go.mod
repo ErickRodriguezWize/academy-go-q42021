@@ -1,10 +1,5 @@
-module example.com
+module github.com/ErickRodriguezWize/academy-go-q42021
 
 go 1.17
 
-require (
-	WizelineApi v0.0.0
-	github.com/gorilla/mux v1.8.0
-)
-
-replace WizelineApi v0.0.0 => ./
+require github.com/gorilla/mux v1.8.0
