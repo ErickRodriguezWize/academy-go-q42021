@@ -1,8 +1,9 @@
 package service
 
 import (
-	"WizelineApi/domain/model"
 	"errors"
+
+	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
 //Servicio utilizado para buscar por ID dentro de un slice del modelod e Pokemon

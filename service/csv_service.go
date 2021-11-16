@@ -4,10 +4,10 @@ import (
 	"encoding/csv"
 	"io"
 	"os"
-	"WizelineApi/domain/model"
-	//"fmt"
 	"errors"
 	"strconv"
+
+	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
 //Funcion para leer un CSV. 

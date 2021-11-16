@@ -2,13 +2,13 @@ package controller
 
 import (
 	"net/http"
-	//"fmt"
-	//"errors"
-	"github.com/gorilla/mux"
 	"encoding/json"
-	"WizelineApi/domain/model"
-	"WizelineApi/service"
 	"strconv"
+
+	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
+	"github.com/ErickRodriguezWize/academy-go-q42021/service"
+
+	"github.com/gorilla/mux"
 )
 
 //Structura vacia del controlador. 
@@ -19,10 +19,7 @@ type PokemonController interface{
 	GetPokemon()
 }
 
-
-
 func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.Request)  {
-	
 	pokemons := []model.Pokemon{}
 	err := service.ReadCSV("./test/bateria_csv/pokemon.csv", &pokemons)
 
@@ -32,15 +29,12 @@ func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 		res.Write([]byte(err.Error()))
 	}
 
-	//leer csv
-	// generar array del csv
-
 	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
 	json.NewEncoder(res).Encode(pokemons)
 }
 
-func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Request) {
+func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Request)  {
 	pokemons := []model.Pokemon{}
 	err := service.ReadCSV("./test/bateria_csv/pokemon.csv", &pokemons)
 
@@ -68,12 +62,9 @@ func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 		res.Write([]byte(err.Error()))
 		return
 	}
-
-	//jsonR, _ := json.Marshal(pkm)
 	
 	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
-	//res.Write(jsonR)
 	json.NewEncoder(res).Encode(pkm)
 }
 
@@ -81,19 +72,3 @@ func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 func NewPokemonController() *pokemonController{
 	return &pokemonController{}
 }
-
-/*
-
-Codigo a reutilziar 
-
-func renderResponse(res *http.ResponseWriter, err error, json interface{}){
-	res.Header().Set("Content-Type", "application/json")
-	if err != nil{
-		res.WriteHeader(http.StatusBadRequest)
-		res.Writer([]byte("Something Went Wrong!!"))
-	}else{
-		res.Writeheader(http.StatusOK)
-		res.Writer(json)
-	}
-}
-*/
