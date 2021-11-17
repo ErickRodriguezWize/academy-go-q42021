@@ -10,44 +10,48 @@ import (
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
-//Funcion para leer un CSV. 
+var (
+	CSVError = errors.New("Couldn't open CSV File")
+	ColumnParseError = errors.New("First Column of CSV most have an Integer Value")
+)
+
+
+//ReadCSV reads a .csv file specific path 
 func ReadCSV(path string, pkms *[]model.Pokemon) (error){
-	
 	file, err := os.Open(path)
 	
 	if err != nil {
-		return  errors.New("Couldn't Open  File")
+		return  CSVError //errors.New("Couldn't Open CSV File")
 	}
 
 	r:= csv.NewReader(file)
 
-	//Loop para leer todos los records del CSV
+	//For loop that read all records from CSV File.
 	for {
 		//Lee el primer (row) del csv. 
 		record, errCsv := r.Read()
 
-		//io.EOF es el error generado cuando se llega al final del archivo
-		if errCsv == io.EOF{ //cuando llegue al final del archivo, se realiza el break del loop for.
-			break
+		//io.EOF error trigger by the end of the file.  
+		if errCsv != nil { 
+			if errCsv== io.EOF{
+				break
+			}
+			return errCsv
 		}
 
-		if errCsv != nil {
-			return errCsv 
-		}
-
-		//Validacion para saber que el CSV contenga ID entero en la primera columna 
-		id, errS := strconv.Atoi(record[0])
+		// Parse validation of ID value (Integer). 
+		ID, errS := strconv.Atoi(record[0])
 		if errS!=nil{
-			return errors.New("First column of CSV most have an Integer Value")
+			return ColumnParseError
 		}
 
-		//Append al slice de structura Pokemons, utilizado en los endpoints de PokemonController
+		//Append to the structured Slice of Pokemons. 
 		*pkms = append(*pkms, model.Pokemon{
-			ID: id,
+			ID: ID,
 			Name: record[1],
 		})
 
 	}
-
 	return nil
+
 }

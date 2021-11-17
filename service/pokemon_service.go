@@ -6,21 +6,21 @@ import (
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
-//Servicio utilizado para buscar por ID dentro de un slice del modelod e Pokemon
-func GetPokemonById(pokemons []model.Pokemon, id int) (model.Pokemon, error){
-	t_pkm := model.Pokemon{}
+//GetPokemonById finds a pokemon inside pokemons array using the ID as filter. 
+func GetPokemonByID(pokemons []model.Pokemon, ID int) (model.Pokemon, error){
+	targetPkm := model.Pokemon{}
 
-	for _,pk := range pokemons{
-		if pk.ID == id {
-			t_pkm = pk
+	for _,pkm := range pokemons{
+		if pkm.ID == ID {
+			targetPkm = pkm
 			break
 		}
 	}
 
-	if t_pkm.Name == "" {
-		return t_pkm, errors.New("Couldnt find pokemon")
-	}else{
-		return t_pkm, nil
+	if targetPkm.Name == "" {
+		return targetPkm, errors.New("Couldnt find pokemon")
 	}
+
+	return targetPkm, nil
 
 }
