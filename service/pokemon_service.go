@@ -6,6 +6,10 @@ import (
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
+var (
+	PokemonMissingError = errors.New("Couldn't find pokemon")
+)
+
 //GetPokemonById finds a pokemon inside pokemons array using the ID as filter. 
 func GetPokemonByID(pokemons []model.Pokemon, ID int) (model.Pokemon, error){
 	targetPkm := model.Pokemon{}
@@ -18,7 +22,7 @@ func GetPokemonByID(pokemons []model.Pokemon, ID int) (model.Pokemon, error){
 	}
 
 	if targetPkm.Name == "" {
-		return targetPkm, errors.New("Couldnt find pokemon")
+		return targetPkm, PokemonMissingError
 	}
 
 	return targetPkm, nil

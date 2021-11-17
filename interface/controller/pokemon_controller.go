@@ -27,9 +27,7 @@ func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 	pokemons := []model.Pokemon{}
 	if err := service.ReadCSV("./test/bateria_csv/pokemon.csv", &pokemons); err != nil {
 		log.Println("Error: " + err.Error() )
-		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusBadRequest)
-		res.Write([]byte(err.Error()))
+		http.Error(res, err.Error(), http.StatusBadRequest)
 		
 		return
 	}
@@ -42,40 +40,30 @@ func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 
 //GetPokemon: Returns a Pokemon using the ID as a filter.
 func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Request) {
-	log.Println("HTTP GET /pokemons/")
-
-	pokemons := []model.Pokemon{}
-	if err := service.ReadCSV("./test/bateria_csv/pokemon.csv", &pokemons); err != nil {
-		log.Println("Error:"+err.Error())
-		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusBadRequest)
-		res.Write([]byte(err.Error()))
-
-		return
-	}	
-
 	pkm := model.Pokemon{}
-
 	params := mux.Vars(req)
-
 	log.Printf("HTTP GET /pokemons/%v \n",params["id"])
 
 	id,err := strconv.Atoi(params["id"])
 	if err != nil {
 		log.Println("ERROR: Couldn't parse Properly to Integer.")
-		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusBadRequest)
-		res.Write([]byte("Couldn't Parse properly to Integer."))
+		http.Error(res, err.Error(), http.StatusBadRequest)
 		
 		return
 	}
 
+	pokemons := []model.Pokemon{}
+	if err := service.ReadCSV("./test/bateria_csv/pokemon.csv", &pokemons); err != nil {
+		log.Println("Error:"+err.Error())
+		http.Error(res, err.Error(), http.StatusBadRequest)
+
+		return
+	}	
+
 	pkm, err = service.GetPokemonByID(pokemons, id)
 	if err != nil {
 		log.Printf("ERROR: Couldn't find pokemon with id: %v \n",id)
-		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusBadRequest)
-		res.Write([]byte(err.Error()))
+		http.Error(res, err.Error(), http.StatusBadRequest)
 		
 		return
 	}

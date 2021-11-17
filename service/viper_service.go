@@ -1,4 +1,4 @@
-/* This service focus on reading the Environment Files of .env using viper go package.  */
+/* This service focus on reading the Environment Files of config.yaml using viper package.  */
 
 package service
 

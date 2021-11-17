@@ -36,6 +36,7 @@ func ReadCSV(path string, pkms *[]model.Pokemon) (error){
 			if errCsv== io.EOF{
 				break
 			}
+			
 			return errCsv
 		}
 
@@ -52,6 +53,7 @@ func ReadCSV(path string, pkms *[]model.Pokemon) (error){
 		})
 
 	}
+
 	return nil
 
 }
