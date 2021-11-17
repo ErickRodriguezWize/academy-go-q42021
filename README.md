@@ -77,6 +77,36 @@ Based on the self-study material and mentorship covered until this deliverable, 
 
 > Note: what’s listed in this deliverable is just for guidance and to help you distribute your workload; you can deliver more or fewer items if necessary. However, if you deliver fewer items at this point, you have to cover the remaining tasks in the next deliverable.
 
+### Deliverables list
+``` API
+- Create Project Structure. 
+- Create 2 endpoints (GetAllPokemons and GetPokemon)
+- Render JSON responses.
+- Create a service that read a CSV file using the PATH. 
+- Create a service that search for a value from CSV using ID. 
+- Handle Errors for specific situations. 
+- Add Environment Variables using viper
+- Use gorilla mux for Router.
+```
+
+### List of Endpoints Created
+``` API Endpoints
+# API ENDPOINTS
+Endpoint: 
+  /pokemons 
+Test:
+  curl -v 'http://localhost:8000/pokemons'
+
+Endpoint: 
+  /pokemons/{id}
+Test:
+  curl -v 'http://localhost:8000/pokemons/133'
+
+```
+
+> Note. The server runs on port 8000.
+<br>
+- - -
 ## Second Deliverable (due November 26th 23:59PM)
 
 Based on the self-study material and mentorship covered until this deliverable, we suggest you perform the following:
@@ -89,7 +119,7 @@ Based on the self-study material and mentorship covered until this deliverable, 
 - Refator if needed
 
 > Note: what’s listed in this deliverable is just for guidance and to help you distribute your workload; you can deliver more or fewer items if necessary. However, if you deliver fewer items at this point, you have to cover the remaining tasks in the next deliverable.
-
+- - -
 ## Final Deliverable (due December 3rd 23:59PM)
 
 - Add a new endpoint
