@@ -13,12 +13,12 @@ func SetupViper() {
 	//Set config filename
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	//Set config file path. 
-	viper.AddConfigPath(".") //Normal Server Running. 
-	viper.AddConfigPath("./..")  //In case of Testing Go files. 
+	//Set config file path.
+	viper.AddConfigPath(".")    //Normal Server Running.
+	viper.AddConfigPath("./..") //In case of Testing Go files.
 
-	err:= viper.ReadInConfig()
-	if err != nil{
+	err := viper.ReadInConfig()
+	if err != nil {
 		log.Fatal("Error: Couldn't Read or find the Environment File.")
 	}
 }

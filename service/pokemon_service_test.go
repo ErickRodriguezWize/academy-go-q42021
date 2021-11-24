@@ -1,20 +1,20 @@
 package service
 
 import (
-	"testing"
 	"fmt"
-	"log"
 	"io/ioutil"
+	"log"
+	"testing"
 
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
 // TestGetPokemonByID - Testing Function that will simulated scenarios for GetPokemonByID
-func TestGetPokemonByID(t *testing.T){
-	//Disabled log ouputs. 
+func TestGetPokemonByID(t *testing.T) {
+	//Disabled log ouputs.
 	log.SetOutput(ioutil.Discard)
 
-	//Defined cases for testing Scenarios. 
+	//Defined cases for testing Scenarios.
 	pokemonCases := []int{1, 30, 55, 130}
 
 	//Get pokemons for the search.
@@ -24,8 +24,8 @@ func TestGetPokemonByID(t *testing.T){
 	}
 
 	//Create the Test for each Cas of GetPokemonById
-	for _,ID := range pokemonCases{
-		t.Run(fmt.Sprintf("[TEST] GetPokemonById: %v", ID), func(t *testing.T){
+	for _, ID := range pokemonCases {
+		t.Run(fmt.Sprintf("[TEST] GetPokemonById: %v", ID), func(t *testing.T) {
 			_, errPokemon := GetPokemonByID(pokemons, ID)
 			if errPokemon != nil {
 				t.Errorf("Error: %v", errPokemon.Error())
