@@ -2,24 +2,20 @@ package service
 
 import (
 	"encoding/csv"
-	"errors"
 	"io"
 	"os"
 	"strconv"
 
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
+	csverr "github.com/ErickRodriguezWize/academy-go-q42021/errors"
 )
 
-//ReadCSV: Reads a .csv file specific path
+//ReadCSV: Reads a .csv file specific path and create an array  with the content of csv file.
 func ReadCSV(path string, pkms *[]model.Pokemon) error {
-	//Potential Errors of CSV.
-	CSVError := errors.New("Couldn't open CSV File")
-	ColumnParseError := errors.New("First Column of CSV most have an Integer Value")
-
 	//Opening the csv file using the path.
 	file, err := os.Open(path)
 	if err != nil {
-		return CSVError
+		return csverr.FileError
 	}
 
 	//Read the content of the file using the package csv.
@@ -42,7 +38,7 @@ func ReadCSV(path string, pkms *[]model.Pokemon) error {
 		// Parse validation of ID value (Integer).
 		ID, errS := strconv.Atoi(record[0])
 		if errS != nil {
-			return ColumnParseError
+			return csverr.ColumnParseError
 		}
 
 		//Append to the structured Slice of Pokemons.
