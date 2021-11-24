@@ -94,12 +94,12 @@ Based on the self-study material and mentorship covered until this deliverable, 
 # API ENDPOINTS
 Endpoint: 
   /pokemons 
-Test:
+cURL call:
   curl -v 'http://localhost:8000/pokemons'
 
 Endpoint: 
   /pokemons/{id}
-Test:
+cURL call:
   curl -v 'http://localhost:8000/pokemons/133'
 
 ```
@@ -119,6 +119,36 @@ Based on the self-study material and mentorship covered until this deliverable, 
 - Refator if needed
 
 > Note: what’s listed in this deliverable is just for guidance and to help you distribute your workload; you can deliver more or fewer items if necessary. However, if you deliver fewer items at this point, you have to cover the remaining tasks in the next deliverable.
+
+### Deliverables list
+``` API
+- Create 1 endpoint and the handler(controller).
+- Render JSON responses.
+- Create a service(Client) that make an HTTP Call to an external API. 
+- Create testing files for: pokemon_service.go and spotify_service.go
+- Handle Errors for specific situations. 
+- Create a file to wrap all Custom Errors. 
+- Add Environment Variables to config.yaml (tokens, api endpoints, etc).
+```
+
+> Note: I use the Spotify API to make this deliverable. 
+
+### List of Endpoints Created
+``` API Endpoints
+# API ENDPOINTS
+Endpoint: 
+  /artists/{artist}
+cURL call:
+  curl -v 'http://localhost:8000/artists/daft+punk'
+  curl -v 'http://localhost:8000/artists/queens'
+```
+### Test Services
+```API Endpoints
+#To run the test from my project
+go test ./... 
+```
+
+>Note: The output will be 3 cases for pokemon_service and 3 cases for spotify_service. 
 - - -
 ## Final Deliverable (due December 3rd 23:59PM)
 
