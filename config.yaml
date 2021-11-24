@@ -1,0 +1,6 @@
+IP_ADDRESS: "127.0.0.1"
+PORT: "8000"
+READ_TIMEOUT: 15
+WRITE_TIMEOUT: 15
+
+CSV_PATH: "./test/bateria_csv/pokemon.csv"
