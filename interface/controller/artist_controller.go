@@ -11,6 +11,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var path = service.GetEnvVariable("CSV_ARTIST_PATH")
+
 type artistController struct{}
 
 type ArtistController interface {
@@ -27,6 +29,14 @@ func (mv *artistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 	targetArtist := model.Artist{}
 	err := service.SearchArtist(artist, &targetArtist)
 	if err != nil {
+		log.Println("Error: " + err.Error())
+		http.Error(res, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	//Write the response from External API into a csv file.
+	if err := service.WriteArtistIntoCSV(path, targetArtist); err != nil {
 		log.Println("Error: " + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 

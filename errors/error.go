@@ -7,6 +7,8 @@ type csvError error
 
 var FileError csvError = errors.New("Couldn't Open Csv File")
 var ColumnParseError csvError = errors.New("First Column of CSV most have an Integer Value")
+var CreateError csvError = errors.New("Couldn't Create the Csv File")
+var BadWrite csvError = errors.New("Couldn't Write into the Csv File")
 
 //Errors for /service/pokemon.go
 type pokemonError error
