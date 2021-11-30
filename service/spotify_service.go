@@ -26,66 +26,51 @@ var (
 	/* CONST */ LimitArtist = GetEnvVariable("LIMIT_ARTIST")
 )
 
-// Struct made using JSON to GO Structure Tool: https://mholt.github.io/json-to-go/
-// ArtistResponseJSON is a struct that handle the "unmarshall" information from HTTP Response Body.
-type ArtistResponseJSON struct {
-	Artists struct {
-		Items []struct {
-			Genres       []string `json:"genres"`
-			SpotifyID    string   `json:"id"`
-			Name         string   `json:"name"`
-			ExternalUrls struct {
-				Spotify string `json:"spotify"`
-			} `json:"external_urls"`
-		} `json:"items"`
-	} `json:"artists"`
-}
-
-//SearcArtist: Makes a HTTP GET call to Spotify API to search for an Artist Information.
+// SearcArtist: Makes a HTTP GET call to Spotify API to search for an Artist Information.
 // This func will return an error (in case that one is triggered).
 func SearchArtist(artist string, targetArtist *model.Artist) error {
-	//Get token from Spotify API (Token experies every 30 minutes.)
+	// Get token from Spotify API (Token experies every 30 minutes.)
 	accessToken, err := RefreshToken()
 	if err != nil {
-		return spotiferr.TokenMissing
+		return spotiferr.ErrTokenMissing
 	}
 
 	artist = strings.ReplaceAll(artist, "+", " ")
 
-	//Encoded spaces with "%20". Spotify ask for this escaping for correctly HTTP Calls.
+	// Encoded spaces with "%20". Spotify ask for this escaping for correctly HTTP Calls.
 	encoded_artist := url.QueryEscape(artist)
 	endpoint := SpotifyEndpoint + "search?q=artist:" + encoded_artist + "&type=artist&limit=" + LimitArtist
 	log.Println("*** HTTP GET to", endpoint)
 
-	//Create request with URL endpoint, Method and Headers.
+	// Create request with URL endpoint, Method and Headers.
 	request, err := http.NewRequest("GET", endpoint, nil)
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", "Bearer "+accessToken)
 	if err != nil {
-		return spotiferr.BadRequestFormat
+		return spotiferr.ErrBadRequestFormat
 	}
 
-	//HTTP Client makes the request to Spotify API Endpoint.
+	// HTTP Client makes the request to Spotify API Endpoint.
 	response, _ := http.DefaultClient.Do(request)
 	if response.StatusCode >= 400 {
 		log.Println("Error: ", response)
 
-		return spotiferr.InvalidToken
+		return spotiferr.ErrInvalidToken
 	}
 
-	//Close http.Client Response
+	// Close http.Client Response
 	defer response.Body.Close()
 
-	//Read Response Body from HTTP Call
+	// Read Response Body from HTTP Call
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return spotiferr.ResponseError
+		return spotiferr.ErrResponseError
 	}
 
-	//Unmarshall JSON is use to MAP the values from body json to the Struct ArtistResponseJSON
-	jsonResponse := ArtistResponseJSON{}
+	// Unmarshall JSON is use to MAP the values from body json to the Struct ArtistResponseJSON
+	jsonResponse := model.ArtistResponse{}
 	if err := json.Unmarshal([]byte(string(body)), &jsonResponse); err != nil {
-		return spotiferr.UnmarshallError
+		return spotiferr.ErrUnmarshallError
 
 	}
 
@@ -103,59 +88,52 @@ func SearchArtist(artist string, targetArtist *model.Artist) error {
 	}
 
 	if targetArtist.Name == "" {
-		return spotiferr.ArtistNotFound
+		return spotiferr.ErrArtistNotFound
 	}
 
 	return nil
 
 }
 
-// RepreshResponseJSON is a struct that handle the "unmarshall" information from HTTP Response Body
-// of RefreshToken.
-type RefreshTokenResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-}
-
 // RefreshToken: Make a HTTP POST call to  Spotify API to get a new Token.
 // this func will return an string (refresh token) and an error.
 func RefreshToken() (string, error) {
-	//Data for the HTTP POST CALL
+	// Data for the HTTP POST CALL
 	postData := url.Values{
 		"grant_type":    {"refresh_token"},
 		"refresh_token": {SpotifyRefreshToken},
 	}
 
-	//Create Request HTTP POST CALL structure with data and headers.
+	// Create Request HTTP POST CALL structure with data and headers.
 	request, err := http.NewRequest("POST", SpotifyRefreshEndpoint, strings.NewReader(postData.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	request.Header.Set("Authorization", SpotifyAuhtorizationToken)
 	if err != nil {
-		return "", spotiferr.BadRequestFormat
+		return "", spotiferr.ErrBadRequestFormat
 	}
 
 	//HTTP Client makes the request to the Spotify API Endpoint.
 	response, _ := http.DefaultClient.Do(request)
 	if response.StatusCode >= 400 {
 		log.Println("Error: ", response)
-		return "", spotiferr.InvalidToken
+		return "", spotiferr.ErrInvalidToken
 
 	}
 
-	//Close http.Client
+	// Close http.Client.
 	defer response.Body.Close()
 
-	//Read Response Body from HTTP Call Response
+	// Read Response Body from HTTP Call Response.
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return "", spotiferr.ResponseError
+		return "", spotiferr.ErrResponseError
 
 	}
 
-	//Unmarshall JSON is use to MAP the values from body json to the Struct RefreshTokenResponse
-	jsonResponse := RefreshTokenResponse{}
+	// Unmarshall JSON is use to MAP the values from body json to the Struct RefreshTokenResponse.
+	jsonResponse := model.TokenResponse{}
 	if err := json.Unmarshal([]byte(string(body)), &jsonResponse); err != nil {
-		return "", spotiferr.UnmarshallError
+		return "", spotiferr.ErrUnmarshallError
 
 	}
 

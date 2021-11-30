@@ -8,12 +8,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-//SetupViper: Make the configuration for the viper module (config file, define paths, read config.yaml file).
+// SetupViper: Make the configuration for the viper module (config file, define paths, read config.yaml file).
 func SetupViper() {
-	//Set config filename
+	// Set config filename
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
-	//Set config file path.
+	// Set config file path.
 	viper.AddConfigPath(".")    //Normal Server Running.
 	viper.AddConfigPath("./..") //In case of Testing Go files.
 
@@ -23,7 +23,7 @@ func SetupViper() {
 	}
 }
 
-//GetEnvVariable: Find a String value inside config.yaml(Environment variable file).
+// GetEnvVariable: Find a String value inside config.yaml(Environment variable file).
 func GetEnvVariable(key string) string {
 	SetupViper()
 
@@ -37,7 +37,7 @@ func GetEnvVariable(key string) string {
 
 }
 
-//GetInvVariable: Find an Integer value on config.yaml(Environment variable file).
+// GetInvVariable: Find an Integer value on config.yaml(Environment variable file).
 func GetIntEnvVariable(key string) int {
 	SetupViper()
 

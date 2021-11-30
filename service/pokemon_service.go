@@ -5,7 +5,7 @@ import (
 	pokerr "github.com/ErickRodriguezWize/academy-go-q42021/errors"
 )
 
-//GetPokemonById: finds a pokemon inside pokemons array using the ID as filter.
+// GetPokemonById: finds a pokemon inside pokemons array using the ID as filter.
 func GetPokemonByID(pokemons []model.Pokemon, ID int) (model.Pokemon, error) {
 	targetPkm := model.Pokemon{}
 
@@ -15,6 +15,6 @@ func GetPokemonByID(pokemons []model.Pokemon, ID int) (model.Pokemon, error) {
 		}
 	}
 
-	return targetPkm, pokerr.PokemonNotFound
+	return targetPkm, pokerr.ErrPokemonNotFound
 
 }
