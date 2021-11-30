@@ -14,11 +14,6 @@ import (
 
 type pokemonController struct{}
 
-type PokemonController interface {
-	GetAllPokemon()
-	GetPokemon()
-}
-
 // GetAllPokemon: returns all values inside the csv File.
 func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.Request) {
 	log.Println("HTTP GET /pokemons")
