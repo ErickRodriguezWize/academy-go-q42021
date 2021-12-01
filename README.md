@@ -135,7 +135,6 @@ Based on the self-study material and mentorship covered until this deliverable, 
 
 ### List of Endpoints Created
 ``` API Endpoints
-# API ENDPOINTS
 Endpoint: 
   /artists/{artist}
 cURL call:

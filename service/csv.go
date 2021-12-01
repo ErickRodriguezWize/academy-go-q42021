@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/csv"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -29,15 +30,16 @@ func ReadCSV(path string, pkms *[]model.Pokemon) error {
 
 		// io.EOF error trigger by the end of the file.
 		if errCsv != nil {
-			if errCsv == io.EOF {
+			if errors.Is(errCsv, io.EOF) {
 				break
 			}
 
-			return errCsv
+			return csverr.ErrEndOfFile
 		}
 
 		// Parse validation of ID value (Integer).
 		id, err := strconv.Atoi(record[0])
+		
 		if err != nil {
 			return csverr.ErrColumnParseError
 		}
@@ -64,6 +66,7 @@ func WriteArtistIntoCSV(path string, artist model.Artist) error {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Println("err", err.Error())
+		
 		return csverr.ErrFileError
 	}
 	defer file.Close()

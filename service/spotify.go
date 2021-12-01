@@ -37,14 +37,21 @@ func SearchArtist(artist string, targetArtist *model.Artist, config model.Config
 
 	// Create request with URL endpoint, Method and Headers.
 	request, err := http.NewRequest("GET", endpoint, nil)
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("Authorization", "Bearer "+accessToken)
 	if err != nil {
 		return spotiferr.ErrBadRequestFormat
 	}
 
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", "Bearer "+accessToken)
+
 	// HTTP Client makes the request to Spotify API Endpoint.
-	response, _ := http.DefaultClient.Do(request)
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		log.Println("Error:", err)
+
+		return spotiferr.ErrHttpClient
+	}
+	
 	if response.StatusCode >= 400 {
 		log.Println("Error: ", response)
 
@@ -100,14 +107,21 @@ func RefreshToken(endpoint string, refreshToken string, authToken string) (strin
 
 	// Create Request HTTP POST CALL structure with data and headers.
 	request, err := http.NewRequest("POST", endpoint, strings.NewReader(postData.Encode()))
-	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	request.Header.Set("Authorization", authToken)
 	if err != nil {
 		return "", spotiferr.ErrBadRequestFormat
 	}
 
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	request.Header.Set("Authorization", authToken)
+
 	//HTTP Client makes the request to the Spotify API Endpoint.
-	response, _ := http.DefaultClient.Do(request)
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		log.Println("Error:", err)
+
+		return "",spotiferr.ErrHttpClient
+	}
+	
 	if response.StatusCode >= 400 {
 		log.Println("Error: ", response)
 		return "", spotiferr.ErrInvalidToken

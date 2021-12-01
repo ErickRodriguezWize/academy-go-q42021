@@ -12,18 +12,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type pokemonController struct {
+type PokemonController struct {
 	Config model.Config
 }
 
 // GetAllPokemon: returns all values inside the csv File.
-func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.Request) {
+func (pc *PokemonController) GetAllPokemons(res http.ResponseWriter, req *http.Request) {
 	log.Println("HTTP GET /pokemons")
-	CsvPath := pc.Config.PokemonCsvPath
+	csvPath := pc.Config.PokemonCsvPath
 
 	// Get an array of model.Pokemon from service "ReadCSV".
 	pokemons := []model.Pokemon{}
-	if err := service.ReadCSV(CsvPath, &pokemons); err != nil {
+	if err := service.ReadCSV(csvPath, &pokemons); err != nil {
 		log.Println("Error: " + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 
@@ -44,7 +44,7 @@ func (pc *pokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 }
 
 // GetPokemon: Returns a Pokemon using the ID as a filter.
-func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Request) {
+func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Request) {
 	pkm := model.Pokemon{}
 	params := mux.Vars(req)
 	CsvPath := pc.Config.PokemonCsvPath
@@ -91,8 +91,8 @@ func (pc *pokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 }
 
 // NewPokemonController: Returns an empty Struct of pokemonController.
-func NewPokemonController(config model.Config) *pokemonController {
-	return &pokemonController{
+func NewPokemonController(config model.Config) *PokemonController {
+	return &PokemonController{
 		Config: config,
 	}
 

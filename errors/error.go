@@ -12,6 +12,7 @@ var (
 	ErrColumnParseError csvError = errors.New("First Column of CSV most have an Integer Value")
 	ErrCreateError      csvError = errors.New("Couldn't Create the Csv File")
 	ErrBadWrite         csvError = errors.New("Couldn't Write into the Csv File")
+	ErrEndOfFile		csvError = errors.New("Couldn't Reach end of the file.")
 )
 
 // Errors for /service/pokemon.go
@@ -29,4 +30,5 @@ var (
 	ErrBadRequestFormat spotifyError = errors.New("Bad Request HTTP Format")
 	ErrResponseError    spotifyError = errors.New("Couldn't read Response body")
 	ErrUnmarshallError  spotifyError = errors.New("Couldn't map the API response Correctly")
+	ErrHttpClient		spotifyError = errors.New("The Http Client couldn't make the request")
 )

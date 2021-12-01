@@ -11,12 +11,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type artistController struct {
+type ArtistController struct {
 	Config model.Config
 }
 
 // SearchArtist: Search an Artist using the artist name.
-func (ac *artistController) SearchArtist(res http.ResponseWriter, req *http.Request) {
+func (ac *ArtistController) SearchArtist(res http.ResponseWriter, req *http.Request) {
 	// Get param of artist from gorilla/mux package.
 	artist := mux.Vars(req)["artist"]
 	log.Printf("HTTP GET /artists/%v \n", artist)
@@ -25,6 +25,7 @@ func (ac *artistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 
 	// Search for the artist on the service: spotify.go
 	targetArtist := model.Artist{}
+	
 	err := service.SearchArtist(artist, &targetArtist, ac.Config)
 	if err != nil {
 		log.Println("Error: " + err.Error())
@@ -54,8 +55,8 @@ func (ac *artistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 }
 
 // NewArtistController: Returns an empty Struct of artistController.
-func NewArtistController(config model.Config) *artistController {
-	return &artistController{
+func NewArtistController(config model.Config) *ArtistController {
+	return &ArtistController{
 		Config: config,
 	}
 }
