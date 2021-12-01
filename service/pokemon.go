@@ -9,6 +9,7 @@ import (
 func GetPokemonByID(pokemons []model.Pokemon, ID int) (model.Pokemon, error) {
 	targetPkm := model.Pokemon{}
 
+	// Loop through the pokemosn to find the pokemon with the correct ID
 	for _, pkm := range pokemons {
 		if pkm.ID == ID {
 			return pkm, nil

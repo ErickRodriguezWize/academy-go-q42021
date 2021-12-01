@@ -17,29 +17,22 @@ import (
 	spotiferr "github.com/ErickRodriguezWize/academy-go-q42021/errors"
 )
 
-var (
-	// Environment Variables.
-	/* CONST */ SpotifyEndpoint = GetEnvVariable("SPOTIFY_API_ENDPOINT")
-	/* CONST */ SpotifyRefreshEndpoint = GetEnvVariable("SPOTIFY_REFRESH_ENDPOINT")
-	/* CONST */ SpotifyAuhtorizationToken = GetEnvVariable("SPOTIFY_AUTHORIZATION_TOKEN")
-	/* CONST */ SpotifyRefreshToken = GetEnvVariable("SPOTIFY_REFRESH_TOKEN")
-	/* CONST */ LimitArtist = GetEnvVariable("LIMIT_ARTIST")
-)
-
 // SearcArtist: Makes a HTTP GET call to Spotify API to search for an Artist Information.
 // This func will return an error (in case that one is triggered).
-func SearchArtist(artist string, targetArtist *model.Artist) error {
+func SearchArtist(artist string, targetArtist *model.Artist, config model.Config) error {
 	// Get token from Spotify API (Token experies every 30 minutes.)
-	accessToken, err := RefreshToken()
+	accessToken, err := RefreshToken(config.RefreshEndpoint, config.RefreshToken, config.AuthorizationToken)
 	if err != nil {
 		return spotiferr.ErrTokenMissing
 	}
 
+	spotifyEndpoint := config.SpotifyEndpoint
+	limitArtist := config.LimitArtist
 	artist = strings.ReplaceAll(artist, "+", " ")
 
 	// Encoded spaces with "%20". Spotify ask for this escaping for correctly HTTP Calls.
-	encoded_artist := url.QueryEscape(artist)
-	endpoint := SpotifyEndpoint + "search?q=artist:" + encoded_artist + "&type=artist&limit=" + LimitArtist
+	encodedArtist := url.QueryEscape(artist)
+	endpoint := spotifyEndpoint + "search?q=artist:" + encodedArtist + "&type=artist&limit=" + limitArtist
 	log.Println("*** HTTP GET to", endpoint)
 
 	// Create request with URL endpoint, Method and Headers.
@@ -87,6 +80,7 @@ func SearchArtist(artist string, targetArtist *model.Artist) error {
 		}
 	}
 
+	// Check if the Artist was found or not. 
 	if targetArtist.Name == "" {
 		return spotiferr.ErrArtistNotFound
 	}
@@ -97,17 +91,17 @@ func SearchArtist(artist string, targetArtist *model.Artist) error {
 
 // RefreshToken: Make a HTTP POST call to  Spotify API to get a new Token.
 // this func will return an string (refresh token) and an error.
-func RefreshToken() (string, error) {
+func RefreshToken(endpoint string, refreshToken string, authToken string) (string, error) {
 	// Data for the HTTP POST CALL
 	postData := url.Values{
 		"grant_type":    {"refresh_token"},
-		"refresh_token": {SpotifyRefreshToken},
+		"refresh_token": {refreshToken},
 	}
 
 	// Create Request HTTP POST CALL structure with data and headers.
-	request, err := http.NewRequest("POST", SpotifyRefreshEndpoint, strings.NewReader(postData.Encode()))
+	request, err := http.NewRequest("POST", endpoint, strings.NewReader(postData.Encode()))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	request.Header.Set("Authorization", SpotifyAuhtorizationToken)
+	request.Header.Set("Authorization", authToken)
 	if err != nil {
 		return "", spotiferr.ErrBadRequestFormat
 	}

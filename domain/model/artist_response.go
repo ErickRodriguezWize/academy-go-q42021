@@ -1,7 +1,6 @@
 package model
 
-// Struct made using JSON to GO Structure Tool: https://mholt.github.io/json-to-go/
-// ArtistResponseJSON is a struct that handle the "unmarshall" information from HTTP Response Body.
+// ArtistResponse is a struct that handle the "unmarshall" information from HTTP Response Body.
 type ArtistResponse struct {
 	Artists struct {
 		Items []struct {

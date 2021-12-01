@@ -1,5 +1,5 @@
 // This config file focus on reading the Environment Files of config.yaml using viper package.
-package config 
+package config
 
 import (
 	"log"
@@ -9,15 +9,16 @@ import (
 	"github.com/spf13/viper"
 )
 
-func LoadConfig() *model.Config{
+// LoadConfig: Make the init configurations and return model.Config with all the Env Values.
+func LoadConfig() *model.Config {
 	InitConfig()
 
-	// Unmarshall yaml file(config.yaml) into model.Config struct. 
+	// Unmarshall yaml file(config.yaml) into model.Config struct.
 	conf := &model.Config{}
-	if err:= viper.Unmarshal(conf); err != nil {
+	if err := viper.Unmarshal(conf); err != nil {
 		log.Fatal("Error: Couldn't unmarshall yaml file into a struct.")
 	}
-	
+
 	return conf
 }
 
@@ -30,7 +31,7 @@ func InitConfig() {
 	viper.AddConfigPath(".")    //Normal Server Running.
 	viper.AddConfigPath("./..") //In case of Testing Go files.
 
-	// Read Yaml config file. 
+	// Read Yaml config file.
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Fatal("Error: Couldn't Read or find the Environment File.")
