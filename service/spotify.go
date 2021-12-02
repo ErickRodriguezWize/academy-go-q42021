@@ -51,7 +51,7 @@ func SearchArtist(artist string, targetArtist *model.Artist, config model.Config
 
 		return spotiferr.ErrHttpClient
 	}
-	
+
 	if response.StatusCode >= 400 {
 		log.Println("Error: ", response)
 
@@ -87,7 +87,7 @@ func SearchArtist(artist string, targetArtist *model.Artist, config model.Config
 		}
 	}
 
-	// Check if the Artist was found or not. 
+	// Check if the Artist was found or not.
 	if targetArtist.Name == "" {
 		return spotiferr.ErrArtistNotFound
 	}
@@ -119,9 +119,9 @@ func RefreshToken(endpoint string, refreshToken string, authToken string) (strin
 	if err != nil {
 		log.Println("Error:", err)
 
-		return "",spotiferr.ErrHttpClient
+		return "", spotiferr.ErrHttpClient
 	}
-	
+
 	if response.StatusCode >= 400 {
 		log.Println("Error: ", response)
 		return "", spotiferr.ErrInvalidToken

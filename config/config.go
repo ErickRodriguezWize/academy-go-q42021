@@ -2,28 +2,34 @@
 package config
 
 import (
-	"log"
-
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
+	conferr "github.com/ErickRodriguezWize/academy-go-q42021/errors"
 
 	"github.com/spf13/viper"
 )
 
 // LoadConfig: Make the init configurations and return model.Config with all the Env Values.
-func LoadConfig() *model.Config {
-	InitConfig()
+func LoadConfig() (*model.Config, error) {
+	if err := InitConfig(); err != nil {
+
+	}
 
 	// Unmarshall yaml file(config.yaml) into model.Config struct.
 	conf := &model.Config{}
 	if err := viper.Unmarshal(conf); err != nil {
-		log.Fatal("Error: Couldn't unmarshall yaml file into a struct.")
+		return conf, conferr.ErrUnmarshallYaml
 	}
 
-	return conf
+	// Check for an empty field in config struct.
+	if err := conf.ValidateFields(); err != nil {
+		return conf, err
+	}
+
+	return conf, nil
 }
 
 // InitConfig: Make the configuration for the viper module (config file, define paths, read config.yaml file).
-func InitConfig() {
+func InitConfig() error {
 	// Set config filename
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -34,6 +40,8 @@ func InitConfig() {
 	// Read Yaml config file.
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal("Error: Couldn't Read or find the Environment File.")
+		return conferr.ErrNotFoundYaml
 	}
+
+	return nil
 }

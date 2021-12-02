@@ -39,7 +39,7 @@ func ReadCSV(path string, pkms *[]model.Pokemon) error {
 
 		// Parse validation of ID value (Integer).
 		id, err := strconv.Atoi(record[0])
-		
+
 		if err != nil {
 			return csverr.ErrColumnParseError
 		}
@@ -66,7 +66,7 @@ func WriteArtistIntoCSV(path string, artist model.Artist) error {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Println("err", err.Error())
-		
+
 		return csverr.ErrFileError
 	}
 	defer file.Close()

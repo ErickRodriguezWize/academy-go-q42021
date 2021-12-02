@@ -25,7 +25,7 @@ func (ac *ArtistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 
 	// Search for the artist on the service: spotify.go
 	targetArtist := model.Artist{}
-	
+
 	err := service.SearchArtist(artist, &targetArtist, ac.Config)
 	if err != nil {
 		log.Println("Error: " + err.Error())

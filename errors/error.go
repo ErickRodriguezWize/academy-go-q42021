@@ -4,6 +4,13 @@ package errors
 
 import "errors"
 
+type confError error
+
+var (
+	ErrUnmarshallYaml = errors.New("Error:Couldn't unmarshall taml file into a struct")
+	ErrNotFoundYaml   = errors.New("Error: Couldn't find or read the Yaml file")
+)
+
 // Errors for /service/csv.go
 type csvError error
 
@@ -12,7 +19,7 @@ var (
 	ErrColumnParseError csvError = errors.New("First Column of CSV most have an Integer Value")
 	ErrCreateError      csvError = errors.New("Couldn't Create the Csv File")
 	ErrBadWrite         csvError = errors.New("Couldn't Write into the Csv File")
-	ErrEndOfFile		csvError = errors.New("Couldn't Reach end of the file.")
+	ErrEndOfFile        csvError = errors.New("Couldn't Reach end of the file.")
 )
 
 // Errors for /service/pokemon.go
@@ -30,5 +37,5 @@ var (
 	ErrBadRequestFormat spotifyError = errors.New("Bad Request HTTP Format")
 	ErrResponseError    spotifyError = errors.New("Couldn't read Response body")
 	ErrUnmarshallError  spotifyError = errors.New("Couldn't map the API response Correctly")
-	ErrHttpClient		spotifyError = errors.New("The Http Client couldn't make the request")
+	ErrHttpClient       spotifyError = errors.New("The Http Client couldn't make the request")
 )
