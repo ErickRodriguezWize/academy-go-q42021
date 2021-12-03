@@ -36,6 +36,7 @@ func InitConfig() error {
 	// Set config file path.
 	viper.AddConfigPath(".")    //Normal Server Running.
 	viper.AddConfigPath("./..") //In case of Testing Go files.
+	viper.AddConfigPath("./../..") //In case of Testing Go files.
 
 	// Read Yaml config file.
 	err := viper.ReadInConfig()

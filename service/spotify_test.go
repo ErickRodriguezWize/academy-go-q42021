@@ -1,11 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"testing"
 
+	"github.com/ErickRodriguezWize/academy-go-q42021/config"
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
@@ -14,16 +14,30 @@ func TestSearchArtist(t *testing.T) {
 	//Disabled Logs from the server.
 	log.SetOutput(ioutil.Discard)
 
-	//Define cases for testing Scenarios
-	artistCases := []string{"eminem", "daft+punk", "papa+roach"}
+	// test cases.
+	tests := map[string]struct{
+		input string
+		want string
+	}{
+		"valid artist": 		{input: "papa+roach", want: ""},
+		"artist with coma": 	{input: "linkin,park", want: "Artist not found"},
+		"artist with space":	{input: "the beatles", want: ""},
+		"artist not found":		{input: "queenshishiux", want: "Artist not found"},
+	}
 
-	//t.Run for test scenarios for SearchArtist Func.
-	for _, artist := range artistCases {
-		t.Run(fmt.Sprintf("[TEST] Search Artist: %v ", artist), func(t *testing.T) {
+	conf, _ := config.LoadConfig()
+	
+	// Table test cases. 
+	for name, tsc := range tests {
+		t.Run(name, func(t *testing.T) {
 			emptyArtist := model.Artist{}
-			err := SearchArtist(artist, &emptyArtist)
+			err := SearchArtist(tsc.input, &emptyArtist, *conf)
+
 			if err != nil {
-				t.Errorf("Error: %v", err.Error())
+				if err.Error() != tsc.want {
+					t.Fatalf("Error: %v", err.Error())
+				}
+				
 			}
 		})
 	}

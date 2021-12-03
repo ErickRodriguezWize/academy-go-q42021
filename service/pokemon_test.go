@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"testing"
@@ -14,21 +13,36 @@ func TestGetPokemonByID(t *testing.T) {
 	//Disabled log ouputs.
 	log.SetOutput(ioutil.Discard)
 
-	//Defined cases for testing Scenarios.
-	pokemonCases := []int{1, 30, 55, 130}
-
-	//Get pokemons for the search.
-	pokemons := []model.Pokemon{}
-	if err := ReadCSV("./../test/bateria_csv/pokemon.csv", &pokemons); err != nil {
-		log.Fatalf("Couldn't Read CSV")
+	// test cases.
+	tests := map[string]struct{
+		input int
+		want string
+	}{
+		"pokemon found: Charmeleon": {input:5,  want: ""},
+		"pokemon found: Charizard": {input:6,  want: ""},
+		"pokemon not found": {input:10,  want: "Pokemon not Found"},
 	}
 
-	//Create the Test for each Cas of GetPokemonById
-	for _, ID := range pokemonCases {
-		t.Run(fmt.Sprintf("[TEST] GetPokemonById: %v", ID), func(t *testing.T) {
-			_, errPokemon := GetPokemonByID(pokemons, ID)
-			if errPokemon != nil {
-				t.Errorf("Error: %v", errPokemon.Error())
+	mockPokemons := []model.Pokemon{
+		{1,"Bulbasaur"},
+		{2,"Ivysaur"},
+		{3,"Venusaur"},
+		{4,"Charmander"},
+		{5,"Charmeleon"},
+		{6,"Charizard"},
+		{8,"Wartortle"},
+		{9,"Blastoise"},
+	}
+
+
+	// Table test cases.
+	for name, tsc := range tests {
+		t.Run(name, func(t *testing.T) {
+			_, err := GetPokemonByID(mockPokemons, tsc.input)
+			if err != nil {
+				if err.Error() != tsc.want{
+					t.Fatalf("Pokemon not found with the id: %d", tsc.input)
+				}	
 			}
 		})
 	}

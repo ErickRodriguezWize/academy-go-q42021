@@ -10,6 +10,6 @@ LIMIT_ARTIST: "30"
 READ_TIMEOUT: "15"
 WRITE_TIMEOUT: "15"
 
-CSV_PATH: "./test/bateria_csv/pokemon.csv"
-CSV_ARTIST_PATH: "./test/bateria_csv/artist.csv"
+CSV_PATH: "test/bateria_csv/pokemon.csv"
+CSV_ARTIST_PATH: "test/bateria_csv/artist.csv"
 

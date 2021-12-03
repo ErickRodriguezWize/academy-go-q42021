@@ -22,6 +22,11 @@ func NewRouter() router {
 func (router) Init(config *model.Config) {
 	r := mux.NewRouter()
 
+	AddRoutes(r, config)
+	initServer(r, *config)
+}
+
+func AddRoutes(r *mux.Router, config *model.Config){
 	// Pokemon Endpoints
 	pokemonHandler := controller.NewPokemonController(*config)
 	r.HandleFunc("/pokemons", pokemonHandler.GetAllPokemons).Methods("GET")
@@ -30,8 +35,6 @@ func (router) Init(config *model.Config) {
 	// Movie Endpoints
 	artistHandler := controller.NewArtistController(*config)
 	r.HandleFunc("/artists/{artist}", artistHandler.SearchArtist).Methods("GET")
-
-	initServer(r, *config)
 }
 
 // initServer: Setup configuration for Go server (IP,host, Timeouts).
