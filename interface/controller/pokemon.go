@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -81,11 +82,21 @@ func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 
 func (pc *PokemonController) GetPokemonsWorker(res http.ResponseWriter, req *http.Request) {
 	params := req.URL.Query()
-	
 	t := params.Get("type")
+
 	if t == ""{
-		log.Println("Empty Query param: type.")
+		log.Println("ERROR: Empty value in query params type.")
+		http.Error(res, errors.New("empty value in query params type").Error(), http.StatusBadRequest)
+
+		return
 		
+	}
+
+	if t != "odd" &&  t!="even"{
+		log.Println("ERROR: Invalid type value in query params.", t)
+		http.Error(res, errors.New("invalid type value in query params").Error(), http.StatusBadRequest)
+
+		return
 	}
 
 	// Parsing the 'item' from string into int.
@@ -106,8 +117,7 @@ func (pc *PokemonController) GetPokemonsWorker(res http.ResponseWriter, req *htt
 		return
 	}
 
-	
-
+	// Get pokemons using the WorkerPool
 	results := pc.PokemonInteractor.GetPokemonWorker(t, items, itemsWorker)
 	log.Printf("HTTP GET /pokemons/worker?type=%v&item=%v&item_per_worker=%v \n", t, items, itemsWorker)
 
