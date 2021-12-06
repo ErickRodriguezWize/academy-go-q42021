@@ -33,6 +33,7 @@ func (r *Router) CreateRoutes() {
 
 	//Pokemon Endpoints
 	r.mux.HandleFunc("/pokemons", handlers.PokemonHandler.GetAllPokemons).Methods("GET")
+	r.mux.HandleFunc("/pokemons/worker", handlers.PokemonHandler.GetPokemonsWorker).Methods("GET")
 	r.mux.HandleFunc("/pokemons/{id}", handlers.PokemonHandler.GetPokemon).Methods("GET")
 
 	// Movie Endpoints

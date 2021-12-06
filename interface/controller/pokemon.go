@@ -79,6 +79,51 @@ func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 
 }
 
+func (pc *PokemonController) GetPokemonsWorker(res http.ResponseWriter, req *http.Request) {
+	params := req.URL.Query()
+	
+	t := params.Get("type")
+	if t == ""{
+		log.Println("Empty Query param: type.")
+		
+	}
+
+	// Parsing the 'item' from string into int.
+	items, err := strconv.Atoi(params.Get("items"))
+	if err != nil {
+		log.Println("ERROR: Couldn't parse items Properly to Integer.")
+		http.Error(res, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	// Parsing the 'itemsWorker' from string into int.
+	itemsWorker, err := strconv.Atoi(params.Get("items_per_worker"))
+	if err != nil {
+		log.Println("ERROR: Couldn't parse itemsWorker Properly to Integer.")
+		http.Error(res, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+	
+
+	results := pc.PokemonInteractor.GetPokemonWorker(t, items, itemsWorker)
+	log.Printf("HTTP GET /pokemons/worker?type=%v&item=%v&item_per_worker=%v \n", t, items, itemsWorker)
+
+	// Setup response (headers, http Status)
+	res.Header().Set("Content-Type", "application/json")
+	res.WriteHeader(http.StatusOK)
+
+	// Handling Response Json.
+	if err := json.NewEncoder(res).Encode(results); err != nil {
+		http.Error(res, err.Error(), http.StatusBadRequest)
+
+		return
+	}
+
+}
+
 // NewPokemonController: Returns an empty Struct of pokemonController.
 func NewPokemonController(pi interactor.PokemonInteractor) *PokemonController {
 	return &PokemonController{pi}

@@ -38,3 +38,13 @@ func (pi *PokemonInteractor) GetPokemon(ID int) (model.Pokemon, error) {
 
 	return pkm, nil
 }
+
+func(pi *PokemonInteractor) GetPokemonWorker(t string, items int, itemsPerWorker int)([]model.Pokemon){
+	var pokemons []model.Pokemon
+	if err := pi.CsvService.ReadCSV(&pokemons); err != nil {
+		return pokemons
+	}
+	results := pi.PokemonService.GetPokemonWorker(pokemons, t, items, itemsPerWorker)
+
+	return results
+}
