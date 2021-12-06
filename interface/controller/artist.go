@@ -5,14 +5,13 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
-	"github.com/ErickRodriguezWize/academy-go-q42021/service"
+	"github.com/ErickRodriguezWize/academy-go-q42021/usecase/interactor"
 
 	"github.com/gorilla/mux"
 )
 
 type ArtistController struct {
-	Config model.Config
+	ArtistInteractor interactor.ArtistInteractor
 }
 
 // SearchArtist: Search an Artist using the artist name.
@@ -21,21 +20,9 @@ func (ac *ArtistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 	artist := mux.Vars(req)["artist"]
 	log.Printf("HTTP GET /artists/%v \n", artist)
 
-	CsvPath := ac.Config.ArtistCsvPath
-
-	// Search for the artist on the service: spotify.go
-	targetArtist := model.Artist{}
-
-	err := service.SearchArtist(artist, &targetArtist, ac.Config)
+	// Search for artist using his name. 
+	targetArtist, err := ac.ArtistInteractor.SearchArtist(artist)
 	if err != nil {
-		log.Println("Error: " + err.Error())
-		http.Error(res, err.Error(), http.StatusBadRequest)
-
-		return
-	}
-
-	// Write the response from External API into a csv file.
-	if err := service.WriteArtistIntoCSV(CsvPath, targetArtist); err != nil {
 		log.Println("Error: " + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 
@@ -55,8 +42,6 @@ func (ac *ArtistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 }
 
 // NewArtistController: Returns an empty Struct of artistController.
-func NewArtistController(config model.Config) *ArtistController {
-	return &ArtistController{
-		Config: config,
-	}
+func NewArtistController(ai interactor.ArtistInteractor) *ArtistController {
+	return &ArtistController{ai}
 }

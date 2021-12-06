@@ -12,9 +12,19 @@ import (
 	csverr "github.com/ErickRodriguezWize/academy-go-q42021/errors"
 )
 
+type CsvService struct {
+	config model.Config
+}
+
+// NewCsvService: Constructor for CsvService struct. 
+func NewCsvService(config model.Config) CsvService {
+	return CsvService{config}
+}
+
 // ReadCSV: Reads a .csv file specific path and create an array  with the content of csv file.
-func ReadCSV(path string, pkms *[]model.Pokemon) error {
+func (cs CsvService) ReadCSV(pkms *[]model.Pokemon) error {
 	// Opening the csv file using the path.
+	path := cs.config.PokemonCsvPath
 	file, err := os.Open(path)
 	if err != nil {
 		return csverr.ErrFileError
@@ -58,7 +68,9 @@ func ReadCSV(path string, pkms *[]model.Pokemon) error {
 
 // WriteArtistIntoCSV: Append data(model.Artist) to the file '/test/bateria_csv/artist.csv'.
 // Return error.
-func WriteArtistIntoCSV(path string, artist model.Artist) error {
+func (cs CsvService) StoreArtist(artist model.Artist) error {
+	path := cs.config.ArtistCsvPath
+
 	// Opening/Creating csv file.
 	// O_WRONLY: Open File in Write only mode.
 	// O_CREATE: Create new file if none exists.

@@ -9,23 +9,23 @@ import (
 )
 
 // LoadConfig: Make the init configurations and return model.Config with all the Env Values.
-func LoadConfig() (*model.Config, error) {
+func LoadConfig() (model.Config, error) {
 	if err := InitConfig(); err != nil {
-
+		return model.Config{}, err
 	}
 
 	// Unmarshall yaml file(config.yaml) into model.Config struct.
 	conf := &model.Config{}
 	if err := viper.Unmarshal(conf); err != nil {
-		return conf, conferr.ErrUnmarshallYaml
+		return model.Config{}, conferr.ErrUnmarshallYaml
 	}
 
 	// Check for an empty field in config struct.
 	if err := conf.ValidateFields(); err != nil {
-		return conf, err
+		return model.Config{}, err
 	}
 
-	return conf, nil
+	return *conf, nil
 }
 
 // InitConfig: Make the configuration for the viper module (config file, define paths, read config.yaml file).
@@ -34,8 +34,8 @@ func InitConfig() error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	// Set config file path.
-	viper.AddConfigPath(".")    //Normal Server Running.
-	viper.AddConfigPath("./..") //In case of Testing Go files.
+	viper.AddConfigPath(".")       //Normal Server Running.
+	viper.AddConfigPath("./..")    //In case of Testing Go files.
 	viper.AddConfigPath("./../..") //In case of Testing Go files.
 
 	// Read Yaml config file.

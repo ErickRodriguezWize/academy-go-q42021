@@ -11,40 +11,44 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type router struct{}
-
-// NewRouter: Returns an emptu router Struct.
-func NewRouter() router {
-	return router{}
+// Router: Struct that use to Initialized server and add Routes to project. 
+type Router struct {
+	mux    *mux.Router
+	config model.Config
+	app    *controller.AppController
 }
 
-// NewRouter: Make the Routing Setup for the App with viper(package).
-func (router) Init(config *model.Config) {
-	r := mux.NewRouter()
-
-	AddRoutes(r, config)
-	initServer(r, *config)
+// NewRouter: Constructor for Router struct. 
+func NewRouter(config model.Config, app *controller.AppController) *Router {
+	return &Router{
+		mux.NewRouter(),
+		config,
+		app,
+	}
 }
 
-func AddRoutes(r *mux.Router, config *model.Config){
-	// Pokemon Endpoints
-	pokemonHandler := controller.NewPokemonController(*config)
-	r.HandleFunc("/pokemons", pokemonHandler.GetAllPokemons).Methods("GET")
-	r.HandleFunc("/pokemons/{id}", pokemonHandler.GetPokemon).Methods("GET")
+// CreateRoutes: Manage all Handlers(controller methods) for the project. 
+func (r *Router) CreateRoutes() {
+	handlers := r.app
+
+	//Pokemon Endpoints
+	r.mux.HandleFunc("/pokemons", handlers.PokemonHandler.GetAllPokemons).Methods("GET")
+	r.mux.HandleFunc("/pokemons/{id}", handlers.PokemonHandler.GetPokemon).Methods("GET")
 
 	// Movie Endpoints
-	artistHandler := controller.NewArtistController(*config)
-	r.HandleFunc("/artists/{artist}", artistHandler.SearchArtist).Methods("GET")
+	r.mux.HandleFunc("/artists/{artist}", handlers.ArtistHandler.SearchArtist).Methods("GET")
 }
 
-// initServer: Setup configuration for Go server (IP,host, Timeouts).
-func initServer(r http.Handler, config model.Config) {
+// InitServer: Setup configuration for Go server (IP,host, Timeouts).
+func (r *Router) InitServer() {
+	handler := r.mux
+
 	// Server setup
 	srv := &http.Server{
-		Handler:      r,
-		Addr:         config.Ip + ":" + config.Port,
-		WriteTimeout: time.Duration(config.ReadTimeout) * time.Second,  // Define seconds of WriteTimeout
-		ReadTimeout:  time.Duration(config.WriteTimeout) * time.Second, // Define seconds of ReadTimeout
+		Handler:      handler,
+		Addr:         r.config.Ip + ":" + r.config.Port,
+		WriteTimeout: time.Duration(r.config.ReadTimeout) * time.Second,  // Define seconds of WriteTimeout
+		ReadTimeout:  time.Duration(r.config.WriteTimeout) * time.Second, // Define seconds of ReadTimeout
 	}
 
 	log.Println("Server Started at", srv.Addr)

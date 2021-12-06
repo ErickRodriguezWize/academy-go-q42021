@@ -7,23 +7,22 @@ import (
 	"strconv"
 
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
-	"github.com/ErickRodriguezWize/academy-go-q42021/service"
+	"github.com/ErickRodriguezWize/academy-go-q42021/usecase/interactor"
 
 	"github.com/gorilla/mux"
 )
 
 type PokemonController struct {
-	Config model.Config
+	PokemonInteractor interactor.PokemonInteractor
 }
 
 // GetAllPokemon: returns all values inside the csv File.
 func (pc *PokemonController) GetAllPokemons(res http.ResponseWriter, req *http.Request) {
 	log.Println("HTTP GET /pokemons")
-	csvPath := pc.Config.PokemonCsvPath
 
 	// Get an array of model.Pokemon from service "ReadCSV".
-	pokemons := []model.Pokemon{}
-	if err := service.ReadCSV(csvPath, &pokemons); err != nil {
+	var pokemons []model.Pokemon
+	if err := pc.PokemonInteractor.GetAllPokemons(&pokemons); err != nil {
 		log.Println("Error: " + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 
@@ -45,9 +44,8 @@ func (pc *PokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 
 // GetPokemon: Returns a Pokemon using the ID as a filter.
 func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Request) {
-	pkm := model.Pokemon{}
 	params := mux.Vars(req)
-	CsvPath := pc.Config.PokemonCsvPath
+
 	log.Printf("HTTP GET /pokemons/%v \n", params["id"])
 
 	// Parsing the 'id' from string into int.
@@ -59,19 +57,10 @@ func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	// Get an array of model.Pokemon from service "ReadCSV".
-	pokemons := []model.Pokemon{}
-	if err := service.ReadCSV(CsvPath, &pokemons); err != nil {
-		log.Println("Error:" + err.Error())
-		http.Error(res, err.Error(), http.StatusBadRequest)
-
-		return
-	}
-
-	// Find a pokemon using ID as a filter.
-	pkm, err = service.GetPokemonByID(pokemons, id)
+	// Search for pokemon using his ID. 
+	pokemon, err := pc.PokemonInteractor.GetPokemon(id)
 	if err != nil {
-		log.Printf("ERROR: Couldn't find pokemon with id: %v \n", id)
+		log.Println("Error:" + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 
 		return
@@ -82,7 +71,7 @@ func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 	res.WriteHeader(http.StatusOK)
 
 	// Handling Response Json.
-	if err := json.NewEncoder(res).Encode(pkm); err != nil {
+	if err := json.NewEncoder(res).Encode(pokemon); err != nil {
 		http.Error(res, err.Error(), http.StatusBadRequest)
 
 		return
@@ -91,9 +80,6 @@ func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 }
 
 // NewPokemonController: Returns an empty Struct of pokemonController.
-func NewPokemonController(config model.Config) *PokemonController {
-	return &PokemonController{
-		Config: config,
-	}
-
+func NewPokemonController(pi interactor.PokemonInteractor) *PokemonController {
+	return &PokemonController{pi}
 }

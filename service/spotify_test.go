@@ -15,19 +15,19 @@ func TestSearchArtist(t *testing.T) {
 	log.SetOutput(ioutil.Discard)
 
 	// test cases.
-	tests := map[string]struct{
+	tests := map[string]struct {
 		input string
-		want string
+		want  string
 	}{
-		"valid artist": 		{input: "papa+roach", want: ""},
-		"artist with coma": 	{input: "linkin,park", want: "Artist not found"},
-		"artist with space":	{input: "the beatles", want: ""},
-		"artist not found":		{input: "queenshishiux", want: "Artist not found"},
+		"valid artist":      {input: "papa+roach", want: ""},
+		"artist with coma":  {input: "linkin,park", want: "Artist not found"},
+		"artist with space": {input: "the beatles", want: ""},
+		"artist not found":  {input: "queenshishiux", want: "Artist not found"},
 	}
 
 	conf, _ := config.LoadConfig()
-	
-	// Table test cases. 
+
+	// Table test cases.
 	for name, tsc := range tests {
 		t.Run(name, func(t *testing.T) {
 			emptyArtist := model.Artist{}
@@ -37,7 +37,7 @@ func TestSearchArtist(t *testing.T) {
 				if err.Error() != tsc.want {
 					t.Fatalf("Error: %v", err.Error())
 				}
-				
+
 			}
 		})
 	}

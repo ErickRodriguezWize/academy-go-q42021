@@ -5,6 +5,7 @@ import (
 
 	"github.com/ErickRodriguezWize/academy-go-q42021/config"
 	"github.com/ErickRodriguezWize/academy-go-q42021/infrastructure/router"
+	"github.com/ErickRodriguezWize/academy-go-q42021/registry"
 )
 
 func main() {
@@ -14,7 +15,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Intialize controllers and dependencies.
+	reg := registry.NewRegistry(config)
+	app := reg.NewAppController()
+
 	// Initialize Routing Handling
-	router := router.NewRouter()
-	router.Init(config)
+	router := router.NewRouter(config, app)
+	router.CreateRoutes()
+
+	// Init and serve Go Server.
+	router.InitServer()
 }

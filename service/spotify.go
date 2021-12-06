@@ -17,17 +17,26 @@ import (
 	spotiferr "github.com/ErickRodriguezWize/academy-go-q42021/errors"
 )
 
+type SpotifyService struct {
+	config model.Config
+}
+
+// NewSpotifyService: Constructor for SpotifyService struct.
+func NewSpotifyService(config model.Config) SpotifyService {
+	return SpotifyService{config}
+}
+
 // SearcArtist: Makes a HTTP GET call to Spotify API to search for an Artist Information.
 // This func will return an error (in case that one is triggered).
-func SearchArtist(artist string, targetArtist *model.Artist, config model.Config) error {
+func (sp SpotifyService) SearchArtist(artist string, targetArtist *model.Artist) error {
 	// Get token from Spotify API (Token experies every 30 minutes.)
-	accessToken, err := RefreshToken(config.RefreshEndpoint, config.RefreshToken, config.AuthorizationToken)
+	accessToken, err := RefreshToken(sp.config.RefreshEndpoint, sp.config.RefreshToken, sp.config.AuthorizationToken)
 	if err != nil {
 		return spotiferr.ErrTokenMissing
 	}
 
-	spotifyEndpoint := config.SpotifyEndpoint
-	limitArtist := config.LimitArtist
+	spotifyEndpoint := sp.config.SpotifyEndpoint
+	limitArtist := sp.config.LimitArtist
 	artist = strings.ReplaceAll(artist, "+", " ")
 
 	// Encoded spaces with "%20". Spotify ask for this escaping for correctly HTTP Calls.
