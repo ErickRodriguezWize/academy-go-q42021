@@ -20,7 +20,7 @@ func (ac *ArtistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 	artist := mux.Vars(req)["artist"]
 	log.Printf("HTTP GET /artists/%v \n", artist)
 
-	// Search for artist using his name. 
+	// Search for artist using his name.
 	targetArtist, err := ac.ArtistInteractor.SearchArtist(artist)
 	if err != nil {
 		log.Println("Error: " + err.Error())

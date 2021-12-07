@@ -2,12 +2,12 @@ package controller
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
+	querror "github.com/ErickRodriguezWize/academy-go-q42021/errors"
 	"github.com/ErickRodriguezWize/academy-go-q42021/usecase/interactor"
 
 	"github.com/gorilla/mux"
@@ -53,12 +53,12 @@ func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
 		log.Println("ERROR: Couldn't parse Properly to Integer.")
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		http.Error(res, querror.ErrParseError.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	// Search for pokemon using his ID. 
+	// Search for pokemon using his ID.
 	pokemon, err := pc.PokemonInteractor.GetPokemon(id)
 	if err != nil {
 		log.Println("Error:" + err.Error())
@@ -80,21 +80,23 @@ func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 
 }
 
+// GetPokemonWorker: Get a n items of Pokemon using Workers.
 func (pc *PokemonController) GetPokemonsWorker(res http.ResponseWriter, req *http.Request) {
 	params := req.URL.Query()
 	t := params.Get("type")
 
-	if t == ""{
-		log.Println("ERROR: Empty value in query params type.")
-		http.Error(res, errors.New("empty value in query params type").Error(), http.StatusBadRequest)
+	if t == "" {
+		log.Println("Query param type is missing.")
+		http.Error(res, "error: query param type is missing.", http.StatusBadRequest)
 
 		return
-		
+
 	}
 
-	if t != "odd" &&  t!="even"{
+	// Validate if the type query params has the value odd or even.
+	if t != "odd" && t != "even" {
 		log.Println("ERROR: Invalid type value in query params.", t)
-		http.Error(res, errors.New("invalid type value in query params").Error(), http.StatusBadRequest)
+		http.Error(res, querror.ErrInvalidTypeParams.Error(), http.StatusBadRequest)
 
 		return
 	}
@@ -103,7 +105,7 @@ func (pc *PokemonController) GetPokemonsWorker(res http.ResponseWriter, req *htt
 	items, err := strconv.Atoi(params.Get("items"))
 	if err != nil {
 		log.Println("ERROR: Couldn't parse items Properly to Integer.")
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		http.Error(res, querror.ErrParseError.Error(), http.StatusBadRequest)
 
 		return
 	}
@@ -112,14 +114,20 @@ func (pc *PokemonController) GetPokemonsWorker(res http.ResponseWriter, req *htt
 	itemsWorker, err := strconv.Atoi(params.Get("items_per_worker"))
 	if err != nil {
 		log.Println("ERROR: Couldn't parse itemsWorker Properly to Integer.")
-		http.Error(res, err.Error(), http.StatusBadRequest)
+		http.Error(res, querror.ErrParseError.Error(), http.StatusBadRequest)
 
 		return
 	}
 
-	// Get pokemons using the WorkerPool
-	results := pc.PokemonInteractor.GetPokemonWorker(t, items, itemsWorker)
 	log.Printf("HTTP GET /pokemons/worker?type=%v&item=%v&item_per_worker=%v \n", t, items, itemsWorker)
+	// Get pokemons using the WorkerPool
+	results, err := pc.PokemonInteractor.GetPokemonWorker(t, items, itemsWorker)
+	if err != nil {
+		log.Println(err)
+		http.Error(res, err.Error(), http.StatusBadRequest)
+
+		return
+	}
 
 	// Setup response (headers, http Status)
 	res.Header().Set("Content-Type", "application/json")

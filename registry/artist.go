@@ -5,7 +5,7 @@ import (
 	"github.com/ErickRodriguezWize/academy-go-q42021/usecase/interactor"
 )
 
-// NewArtistController: Register - ArtistController 
+// NewArtistController: Register - ArtistController
 func (r *Registry) NewArtistController() *controller.ArtistController {
 	return controller.NewArtistController(r.NewArtistInteractor())
 }

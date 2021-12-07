@@ -16,7 +16,7 @@ type CsvService struct {
 	config model.Config
 }
 
-// NewCsvService: Constructor for CsvService struct. 
+// NewCsvService: Constructor for CsvService struct.
 func NewCsvService(config model.Config) CsvService {
 	return CsvService{config}
 }
