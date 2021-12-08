@@ -7,7 +7,7 @@ import "errors"
 type queryError error
 
 var (
-	ErrParseError        queryError = errors.New("error: ouldn't process the numeric value correctly")
+	ErrParseError        queryError = errors.New("error: Couldn't process the numeric value correctly")
 	ErrInvalidTypeParams queryError = errors.New("error: The query param 'type' doesn't have the value odd or even")
 )
 
