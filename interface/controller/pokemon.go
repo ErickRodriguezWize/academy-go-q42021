@@ -29,7 +29,7 @@ func (pc *PokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 	log.Println("HTTP GET /pokemons")
 
 	// Get an array of model.Pokemon from service "ReadCSV".
-	pokemons, err := pc.service.GetAllPokemons(); 
+	pokemons, err := pc.service.GetAllPokemons()
 	if err != nil {
 		log.Println("Error: " + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)

@@ -11,7 +11,7 @@ type iSpotifyService interface {
 
 // Artist Interator struct that will contain all the interfaces.
 type ArtistInteractor struct {
-	fileService   iWriteService
+	fileService    iWriteService
 	spotifyService iSpotifyService
 }
 

@@ -24,7 +24,7 @@ func NewPokemonInteractor(ips iPokemonService, irs iReadService) *PokemonInterac
 // GetAllPokemon: Interactor that handle GetAllPokemon logic.
 func (pi *PokemonInteractor) GetAllPokemons() ([]model.Pokemon, error) {
 	// Read and handle errors from file service: read
-	pokemons, err :=  pi.fileService.ReadAll()
+	pokemons, err := pi.fileService.ReadAll()
 	if err != nil {
 		return pokemons, err
 	}
@@ -36,7 +36,7 @@ func (pi *PokemonInteractor) GetPokemon(ID int) (model.Pokemon, error) {
 	var pokemons []model.Pokemon
 	// Read and handle errors from CsvService.ReadCSV
 	pokemons, err := pi.fileService.ReadAll()
-	if  err != nil {
+	if err != nil {
 		return model.Pokemon{}, err
 	}
 

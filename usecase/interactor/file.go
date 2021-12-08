@@ -1,14 +1,14 @@
-package interactor 
+package interactor
 
 import (
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
-type iReadService interface{
+type iReadService interface {
 	ReadAll() ([]model.Pokemon, error)
 }
 
-type iWriteService interface{
+type iWriteService interface {
 	Write(artist model.Artist) error
 }
 
