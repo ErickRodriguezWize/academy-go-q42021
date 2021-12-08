@@ -11,6 +11,6 @@ func (r *Registry) NewPokemonController() *controller.PokemonController {
 }
 
 // NewPokemonInteractor: Register PokemonInteractor
-func (r *Registry) NewPokemonInteractor() interactor.PokemonInteractor {
-	return interactor.NewPokemonInteractor(r.NewPokemonService(), r.NewCsvService())
+func (r *Registry) NewPokemonInteractor() *interactor.PokemonInteractor {
+	return interactor.NewPokemonInteractor(r.NewPokemonService(), r.NewFileService())
 }

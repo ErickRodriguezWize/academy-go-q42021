@@ -11,6 +11,6 @@ func (r *Registry) NewArtistController() *controller.ArtistController {
 }
 
 // NewArtistController: Register - NewArtistInteractor
-func (r *Registry) NewArtistInteractor() interactor.ArtistInteractor {
-	return interactor.NewArtistInteractor(r.NewCsvService(), r.NewSpotifyService())
+func (r *Registry) NewArtistInteractor() *interactor.ArtistInteractor {
+	return interactor.NewArtistInteractor(r.NewFileService(), r.NewSpotifyService())
 }
