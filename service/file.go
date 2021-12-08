@@ -27,6 +27,7 @@ func (fs FileService) ReadAll() ([]model.Pokemon, error) {
 
 	// Opening the csv file using the path.
 	path := fs.config.PokemonCsvPath
+	log.Println(path)
 	file, err := os.Open(path)
 	if err != nil {
 		return pokemons, csverr.ErrFileError

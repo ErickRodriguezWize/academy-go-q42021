@@ -6,38 +6,73 @@ import (
 	"testing"
 
 	"github.com/ErickRodriguezWize/academy-go-q42021/config"
+	spotierr "github.com/ErickRodriguezWize/academy-go-q42021/errors"
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// TestSearch: Testing Function that will simulated scenarios for SearchArtist
-func TestSearchArtist(t *testing.T) {
+// TestSpotifyService_SearchArtist: Unit Testing
+func TestSpotifyService_SearchArtist(t *testing.T) {
 	//Disabled Logs from the server.
 	log.SetOutput(ioutil.Discard)
 
-	// test cases.
-	tests := map[string]struct {
-		input string
-		want  string
-	}{
-		"valid artist":      {input: "papa+roach", want: ""},
-		"artist with coma":  {input: "linkin,park", want: "Artist not found"},
-		"artist with space": {input: "the beatles", want: ""},
-		"artist not found":  {input: "queenshishiux", want: "Artist not found"},
-	}
-
-	conf, _ := config.LoadConfig()
-
+		//testcases
+		testCases:= []struct{
+			name string
+			artist string
+			responseArtist model.Artist
+			errorArtist error
+			hasError bool 
+		}{
+			{
+				name:"Found Queens",
+				artist:"Queen",
+				responseArtist: model.Artist{ID:"6QWuYtzBkQ2Re44gRxaB2e", Name: "Queen", SpotifyURL:"https://open.spotify.com/artist/6QWuYtzBkQ2Re44gRxaB2e", Genres: []string{"classic rock", "glam rock", "rock"}},
+				errorArtist: nil,
+				hasError: false,
+			},
+			{
+				name:"Found Linkin Park",
+				artist:"linkin+park",
+				responseArtist: model.Artist{ID:"6XyY86QOPPrYVGvF9ch6wz", Name: "Linkin Park", SpotifyURL:"https://open.spotify.com/artist/6XyY86QOPPrYVGvF9ch6wz", Genres: []string{"alternative metal", "nu metal", "post-grunge", "rap metal"} },
+				errorArtist: nil, 
+				hasError: false,
+			},
+			{
+				name:"Not Found Artist",
+				artist:"quenxious",
+				responseArtist: model.Artist{},
+				errorArtist:  spotierr.ErrArtistNotFound,
+				hasError: true,
+			},
+			{
+				name:"Coma in name",
+				artist:"papa,roach",
+				responseArtist: model.Artist{},
+				errorArtist: spotierr.ErrArtistNotFound, 
+				hasError: true,
+			},
+		}
+	
 	// Table test cases.
-	for name, tsc := range tests {
-		t.Run(name, func(t *testing.T) {
-			emptyArtist := model.Artist{}
-			err := SearchArtist(tsc.input, &emptyArtist, *conf)
-
-			if err != nil {
-				if err.Error() != tsc.want {
-					t.Fatalf("Error: %v", err.Error())
-				}
-
+	for _, tsc := range testCases {
+		t.Run(tsc.name, func(t *testing.T) {
+			// Initialize config struct with environment variables.
+			config, _ := config.LoadConfig()
+			
+			// Init service struct. 
+			service := NewSpotifyService(config)
+			
+			// Execute method. 
+			artist, err := service.SearchArtist(tsc.artist)
+			
+			// Assert
+			assert.EqualValues(t, artist, tsc.responseArtist)
+			if tsc.hasError{
+				assert.EqualError(t, err, tsc.errorArtist.Error())
+			}else{
+				assert.Nil(t, err)
 			}
 		})
 	}
