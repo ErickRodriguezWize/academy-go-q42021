@@ -5,13 +5,20 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ErickRodriguezWize/academy-go-q42021/usecase/interactor"
+	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 
 	"github.com/gorilla/mux"
 )
 
+// Interface to handle services in ArtistController.
+type interactorArtist interface {
+	SearchArtist(name string) (model.Artist, error)
+	StoreArtist(artist model.Artist) error
+}
+
+// ArtistController struct with the interfaces use.
 type ArtistController struct {
-	ArtistInteractor interactor.ArtistInteractor
+	service interactorArtist
 }
 
 // SearchArtist: Search an Artist using the artist name.
@@ -21,7 +28,7 @@ func (ac *ArtistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 	log.Printf("HTTP GET /artists/%v \n", artist)
 
 	// Search for artist using his name.
-	targetArtist, err := ac.ArtistInteractor.SearchArtist(artist)
+	targetArtist, err := ac.service.SearchArtist(artist)
 	if err != nil {
 		log.Println("Error: " + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
@@ -41,7 +48,7 @@ func (ac *ArtistController) SearchArtist(res http.ResponseWriter, req *http.Requ
 
 }
 
-// NewArtistController: Returns an empty Struct of artistController.
-func NewArtistController(ai interactor.ArtistInteractor) *ArtistController {
-	return &ArtistController{ai}
+// NewArtistController: Initialiazed ArtistController struct and implement interactorArtist interface.
+func NewArtistController(ia interactorArtist) *ArtistController {
+	return &ArtistController{ia}
 }

@@ -8,13 +8,20 @@ import (
 
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 	querror "github.com/ErickRodriguezWize/academy-go-q42021/errors"
-	"github.com/ErickRodriguezWize/academy-go-q42021/usecase/interactor"
 
 	"github.com/gorilla/mux"
 )
 
+// Interface to handle usecase/interactor methods for PokemonController.
+type interactorPokemon interface {
+	GetAllPokemons(pokemons *[]model.Pokemon) error
+	GetPokemon(ID int) (model.Pokemon, error)
+	GetPokemonWorker(t string, items int, itemsPerWorker int) ([]model.Pokemon, error)
+}
+
+// PokemonController struct with the interfaces to implement
 type PokemonController struct {
-	PokemonInteractor interactor.PokemonInteractor
+	service interactorPokemon
 }
 
 // GetAllPokemon: returns all values inside the csv File.
@@ -23,7 +30,7 @@ func (pc *PokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 
 	// Get an array of model.Pokemon from service "ReadCSV".
 	var pokemons []model.Pokemon
-	if err := pc.PokemonInteractor.GetAllPokemons(&pokemons); err != nil {
+	if err := pc.service.GetAllPokemons(&pokemons); err != nil {
 		log.Println("Error: " + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 
@@ -59,7 +66,7 @@ func (pc *PokemonController) GetPokemon(res http.ResponseWriter, req *http.Reque
 	}
 
 	// Search for pokemon using his ID.
-	pokemon, err := pc.PokemonInteractor.GetPokemon(id)
+	pokemon, err := pc.service.GetPokemon(id)
 	if err != nil {
 		log.Println("Error:" + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
@@ -121,7 +128,7 @@ func (pc *PokemonController) GetPokemonsWorker(res http.ResponseWriter, req *htt
 
 	log.Printf("HTTP GET /pokemons/worker?type=%v&item=%v&item_per_worker=%v \n", t, items, itemsWorker)
 	// Get pokemons using the WorkerPool
-	results, err := pc.PokemonInteractor.GetPokemonWorker(t, items, itemsWorker)
+	results, err := pc.service.GetPokemonWorker(t, items, itemsWorker)
 	if err != nil {
 		log.Println(err)
 		http.Error(res, err.Error(), http.StatusBadRequest)
@@ -142,7 +149,7 @@ func (pc *PokemonController) GetPokemonsWorker(res http.ResponseWriter, req *htt
 
 }
 
-// NewPokemonController: Returns an empty Struct of pokemonController.
-func NewPokemonController(pi interactor.PokemonInteractor) *PokemonController {
-	return &PokemonController{pi}
+// NewPokemonController: Initialiazed PokemonController struct and implement interactorPokemon interface.
+func NewPokemonController(ip interactorPokemon) *PokemonController {
+	return &PokemonController{ip}
 }

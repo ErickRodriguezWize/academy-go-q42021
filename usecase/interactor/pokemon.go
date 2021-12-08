@@ -5,20 +5,27 @@ import (
 	"github.com/ErickRodriguezWize/academy-go-q42021/service"
 )
 
+// interface that will handle all the  methods need it for the implementation.
+type iPokemonService interface {
+	GetPokemonByID(pokemons []model.Pokemon, ID int) (model.Pokemon, error)
+	GetPokemonWorker(pokemons []model.Pokemon, t string, items int, itemsPerWorker int) ([]model.Pokemon, error)
+}
+
+// Pokemon Interator struct that will contain all the interfaces implementations.
 type PokemonInteractor struct {
-	PokemonService service.PokemonService
-	CsvService     service.CsvService
+	pokemonService iPokemonService
+	fileService    iFileService
 }
 
-// NewPokemonInteractor: Construcot for PokemonInteractor struct.
-func NewPokemonInteractor(ps service.PokemonService, cs service.CsvService) PokemonInteractor {
-	return PokemonInteractor{ps, cs}
+// NewPokemonInteractor: Construcot for PokemonInteractor struct and implement interfaces.
+func NewPokemonInteractor(ps service.PokemonService, cs service.FileService) *PokemonInteractor {
+	return &PokemonInteractor{ps, cs}
 }
 
-// GetAllPokemon: Interactor Method that handles CsvService.ReadCSV and retrieve pokemons.
+// GetAllPokemon: Interactor that handle GetAllPokemon logic.
 func (pi *PokemonInteractor) GetAllPokemons(pokemons *[]model.Pokemon) error {
 	// Read and handle errors from CsvService.ReadCSV
-	if err := pi.CsvService.ReadCSV(pokemons); err != nil {
+	if err := pi.fileService.ReadAll(pokemons); err != nil {
 		return err
 	}
 	return nil
@@ -29,12 +36,12 @@ func (pi *PokemonInteractor) GetAllPokemons(pokemons *[]model.Pokemon) error {
 func (pi *PokemonInteractor) GetPokemon(ID int) (model.Pokemon, error) {
 	var pokemons []model.Pokemon
 	// Read and handle errors from CsvService.ReadCSV
-	if err := pi.CsvService.ReadCSV(&pokemons); err != nil {
+	if err := pi.fileService.ReadAll(&pokemons); err != nil {
 		return model.Pokemon{}, err
 	}
 
 	// Get the results and posible errors from GetPokemonByID
-	pkm, err := pi.PokemonService.GetPokemonByID(pokemons, ID)
+	pkm, err := pi.pokemonService.GetPokemonByID(pokemons, ID)
 	if err != nil {
 		return model.Pokemon{}, err
 	}
@@ -46,12 +53,12 @@ func (pi *PokemonInteractor) GetPokemon(ID int) (model.Pokemon, error) {
 func (pi *PokemonInteractor) GetPokemonWorker(t string, items int, itemsPerWorker int) ([]model.Pokemon, error) {
 	var pokemons []model.Pokemon
 	// Read and handle errors from CsvService.ReadCSV
-	if err := pi.CsvService.ReadCSV(&pokemons); err != nil {
+	if err := pi.fileService.ReadAll(&pokemons); err != nil {
 		return pokemons, err
 	}
 
 	// Get the results and posible errors from GetPokemonWorker (worker pool method. )
-	results, err := pi.PokemonService.GetPokemonWorker(pokemons, t, items, itemsPerWorker)
+	results, err := pi.pokemonService.GetPokemonWorker(pokemons, t, items, itemsPerWorker)
 	if err != nil {
 		return results, err
 	}
