@@ -11,14 +11,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Router: Struct that use to Initialized server and add Routes to project. 
+// Router: Struct that use to Initialized server and add Routes to project.
 type Router struct {
 	mux    *mux.Router
 	config model.Config
 	app    *controller.AppController
 }
 
-// NewRouter: Constructor for Router struct. 
+// NewRouter: Constructor for Router struct.
 func NewRouter(config model.Config, app *controller.AppController) *Router {
 	return &Router{
 		mux.NewRouter(),
@@ -27,12 +27,13 @@ func NewRouter(config model.Config, app *controller.AppController) *Router {
 	}
 }
 
-// CreateRoutes: Manage all Handlers(controller methods) for the project. 
+// CreateRoutes: Manage all Handlers(controller methods) for the project.
 func (r *Router) CreateRoutes() {
 	handlers := r.app
 
 	//Pokemon Endpoints
 	r.mux.HandleFunc("/pokemons", handlers.PokemonHandler.GetAllPokemons).Methods("GET")
+	r.mux.HandleFunc("/pokemons/worker", handlers.PokemonHandler.GetPokemonsWorker).Methods("GET")
 	r.mux.HandleFunc("/pokemons/{id}", handlers.PokemonHandler.GetPokemon).Methods("GET")
 
 	// Movie Endpoints

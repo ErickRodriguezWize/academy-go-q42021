@@ -4,11 +4,18 @@ package errors
 
 import "errors"
 
+type queryError error
+
+var (
+	ErrParseError        queryError = errors.New("error: Couldn't process the numeric value correctly")
+	ErrInvalidTypeParams queryError = errors.New("error: The query param 'type' doesn't have the value odd or even")
+)
+
 type confError error
 
 var (
-	ErrUnmarshallYaml = errors.New("Error:Couldn't unmarshall taml file into a struct")
-	ErrNotFoundYaml   = errors.New("Error: Couldn't find or read the Yaml file")
+	ErrUnmarshallYaml confError = errors.New("error:Couldn't unmarshall taml file into a struct")
+	ErrNotFoundYaml   confError = errors.New("error: Couldn't find or read the Yaml file")
 )
 
 // Errors for /service/csv.go
@@ -25,7 +32,11 @@ var (
 // Errors for /service/pokemon.go
 type pokemonError error
 
-var ErrPokemonNotFound pokemonError = errors.New("Pokemon not Found")
+var (
+	ErrPokemonNotFound   pokemonError = errors.New("error: Pokemon not Found")
+	ErrNoPokemonResponse pokemonError = errors.New("error: worker couldn't retrieve any pokemon")
+	ErrNotMeetCriteria   pokemonError = errors.New("error: worker didn't meet the criteria")
+)
 
 // Errors for /service/spotify.go
 type spotifyError error

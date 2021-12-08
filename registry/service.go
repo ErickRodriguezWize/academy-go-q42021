@@ -10,8 +10,8 @@ func (r *Registry) NewPokemonService() service.PokemonService {
 }
 
 // NewCsvService: Register CsvService
-func (r *Registry) NewCsvService() service.CsvService {
-	return service.NewCsvService(r.config)
+func (r *Registry) NewFileService() service.FileService {
+	return service.NewFileService(r.config)
 }
 
 // NewSpotifyService: Register Spotifyservice.

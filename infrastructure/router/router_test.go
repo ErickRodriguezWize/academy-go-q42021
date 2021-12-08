@@ -8,77 +8,172 @@ import (
 	"testing"
 
 	"github.com/ErickRodriguezWize/academy-go-q42021/config"
+	"github.com/ErickRodriguezWize/academy-go-q42021/registry"
 
 	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestPokewmonHandler(t *testing.T) {
+func setupRouter() *mux.Router {
+	// Init Config
+	config, _ := config.LoadConfig()
+	config.PokemonCsvPath = "./../../" + config.PokemonCsvPath
+	config.ArtistCsvPath = "./../../" + config.ArtistCsvPath
+
+	// Dependency Injection using Register local package.
+	reg := registry.NewRegistry(config)
+	app := reg.NewAppController() // app that will contain all controllers with their implementations.
+
+	// Init Router
+	router := NewRouter(config, app)
+	router.CreateRoutes()
+
+	return router.mux
+}
+
+// Global Variable with the Routing configuration for testing on all Handlers Testers.
+var m = setupRouter()
+
+// TestRouter_PokeemonHandler: Unit testing for PokemonHandler.
+func TestRouter_PokemonHandler(t *testing.T) {
 	//Disabled log ouputs.
 	log.SetOutput(ioutil.Discard)
 
-	conf, _ := config.LoadConfig()
-	conf.PokemonCsvPath = "./../../" + conf.PokemonCsvPath
-
-	tests := map[string]struct {
+	//testcases
+	tests := []struct {
+		name      string
 		handler   string
 		method    string
 		endpoint  string
+		error     error
+		hasError  bool
 		want_code int
 	}{
-		"all pokemons":      {handler: "GetAllPokemons", method: "GET", endpoint: "/pokemons", want_code: 200},
-		"found pokemon":     {handler: "GetPokemon", method: "GET", endpoint: "/pokemons/5", want_code: 200},
-		"not found pokemon": {handler: "GetPokemon", method: "GET", endpoint: "/pokemons/167", want_code: 400},
+		{
+			name:      "GetAllPokemons OK",
+			method:    "GET",
+			endpoint:  "/pokemons",
+			want_code: 200,
+		},
+		{
+			name:      "GetPokemon OK",
+			method:    "GET",
+			endpoint:  "/pokemons/60",
+			want_code: 200,
+		},
+		{
+			name:      "GetPokemon Not Found",
+			method:    "GET",
+			endpoint:  "/pokemons/600",
+			want_code: 400,
+		},
+		{
+			name:      "Parse Error",
+			method:    "GET",
+			endpoint:  "/pokemons/titulo",
+			want_code: 400,
+		},
+		{
+			name:      "PokemonWorker Even OK",
+			method:    "GET",
+			endpoint:  "/pokemons/worker?type=even&items=25&items_per_worker=5",
+			want_code: 200,
+		},
+		{
+			name:      "PokemonWorker Odd OK",
+			method:    "GET",
+			endpoint:  "/pokemons/worker?type=odd&items=25&items_per_worker=5",
+			want_code: 200,
+		},
+		{
+			name:      "PokemonWorker Invalid Type",
+			method:    "GET",
+			endpoint:  "/pokemons/worker?type=odding&items=25&items_per_worker=5",
+			want_code: 400,
+		},
+		{
+			name:      "PokemonWorker Empty Type",
+			method:    "GET",
+			endpoint:  "/pokemons/worker?type=&items=25&items_per_worker=5",
+			want_code: 400,
+		},
+		{
+			name:      "PokemonWorker Invalid item",
+			method:    "GET",
+			endpoint:  "/pokemons/worker?type=&items=six&items_per_worker=5",
+			want_code: 400,
+		},
 	}
 
-	m := mux.NewRouter()
-	AddRoutes(m, conf)
-
-	for name, tsc := range tests {
-		t.Run(name, func(t *testing.T) {
+	for _, tsc := range tests {
+		// Run Test.
+		t.Run(tsc.name, func(t *testing.T) {
+			// Dummy res http.ResponseWriter and req *http.Request
 			req, _ := http.NewRequest(tsc.method, tsc.endpoint, nil)
 			w := httptest.NewRecorder()
+
+			// Serve router and run request.
 			m.ServeHTTP(w, req)
-			if w.Code != tsc.want_code {
-				t.Fatalf("Expected HTTP Code:%d, Actual HTTP Code: %d ", tsc.want_code, w.Code)
-			}
+
+			// Assert results
+			assert.EqualValues(t, w.Code, tsc.want_code)
 		})
 	}
 
 }
 
-func TestArtistHandler(t *testing.T) {
+func TestRouter_ArtistHandler(t *testing.T) {
 	//Disabled log ouputs.
 	log.SetOutput(ioutil.Discard)
 
-	conf, _ := config.LoadConfig()
-	conf.ArtistCsvPath = "./../../" + conf.ArtistCsvPath
-
-	// test cases.
-	tests := map[string]struct {
+	//testcases
+	tests := []struct {
+		name      string
 		handler   string
 		method    string
-		artist    string
 		endpoint  string
+		error     error
+		hasError  bool
 		want_code int
 	}{
-		"simple artist":      {handler: "SearchArtist", method: "GET", artist: "linkin+park", endpoint: "/artists/linkin+park", want_code: 200},
-		"artist with a coma": {handler: "SearchArtist", method: "GET", artist: "linki,park", endpoint: "/artist/linkin,park", want_code: 404},
-		"not found artist":   {handler: "SearchArtist", method: "GET", artist: "linkin+bizkif", endpoint: "/artist/linkin+bizkif", want_code: 404},
+		{
+			name:      "SearchArtist: Linkin Park",
+			method:    "GET",
+			endpoint:  "/artists/linkin+park",
+			want_code: 200,
+		},
+		{
+			name:      "Search: Queens",
+			method:    "GET",
+			endpoint:  "/artists/queens",
+			want_code: 200,
+		},
+		{
+			name:      "Not found Artist",
+			method:    "GET",
+			endpoint:  "/artists/queenssichu",
+			want_code: 400,
+		},
+		{
+			name:      "Not found with coma",
+			method:    "GET",
+			endpoint:  "/artists/papa,roach",
+			want_code: 400,
+		},
 	}
 
-	m := mux.NewRouter()
-	AddRoutes(m, conf)
-
-	// Test table cases.
-	for name, tsc := range tests {
-		t.Run(name, func(t *testing.T) {
-
+	for _, tsc := range tests {
+		// Run Test.
+		t.Run(tsc.name, func(t *testing.T) {
+			// Dummy res http.ResponseWriter and req *http.Request
 			req, _ := http.NewRequest(tsc.method, tsc.endpoint, nil)
 			w := httptest.NewRecorder()
+
+			// Serve router and run request.
 			m.ServeHTTP(w, req)
-			if w.Code != tsc.want_code {
-				t.Fatalf("Expected HTTP CODE:%d , actual HTTP CODE: %d", tsc.want_code, w.Code)
-			}
+
+			// Assert results
+			assert.EqualValues(t, w.Code, tsc.want_code)
 		})
 	}
 

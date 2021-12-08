@@ -2,39 +2,44 @@ package interactor
 
 import (
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
-	"github.com/ErickRodriguezWize/academy-go-q42021/service"
 )
 
+// interface that will handle all spotify methods for implementacion.
+type iSpotifyService interface {
+	SearchArtist(artist string) (model.Artist, error)
+}
+
+// Artist Interator struct that will contain all the interfaces.
 type ArtistInteractor struct {
-	CsvService     service.CsvService
-	SpotifyService service.SpotifyService
+	fileService    iWriteService
+	spotifyService iSpotifyService
 }
 
-// NewArtistInteractor: Constructo for artistInteractor.
-func NewArtistInteractor(csv service.CsvService, sp service.SpotifyService) ArtistInteractor {
-	return ArtistInteractor{csv, sp}
+// NewArtistInteractor: Construct for ArtistInteractor struct and implement interfaces.
+func NewArtistInteractor(iws iWriteService, isp iSpotifyService) *ArtistInteractor {
+	return &ArtistInteractor{iws, isp}
 }
 
-// SearchArtist: Handle use of SpotifyService/SearchArtist .
+// SearchArtist: Handle use of SearchArtist service
 func (ai *ArtistInteractor) SearchArtist(name string) (model.Artist, error) {
-	artist := model.Artist{}
 	// Search artis using Spotify Service
-	if err := ai.SpotifyService.SearchArtist(name, &artist); err != nil {
+	foundArtist, err := ai.spotifyService.SearchArtist(name)
+	if err != nil {
 		return model.Artist{}, err
 	}
 
 	// Store it into the CSV.
-	if err := ai.StoreArtist(artist); err != nil {
+	if err := ai.StoreArtist(foundArtist); err != nil {
 		return model.Artist{}, err
 	}
 
-	return artist, nil
+	return foundArtist, nil
 }
 
-// StoreArtist: Handle use of CsvService/StoreArtist
+// StoreArtist: Interactor method to handle storeartist service.
 func (ai *ArtistInteractor) StoreArtist(artist model.Artist) error {
-	// Write the response from External API into a csv file.
-	if err := ai.CsvService.StoreArtist(artist); err != nil {
+	// Write the response from External API into a file.
+	if err := ai.fileService.Write(artist); err != nil {
 		return err
 	}
 

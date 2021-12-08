@@ -15,9 +15,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Intialize controllers and dependencies.
+	// Dependency Injection using Register local package.
 	reg := registry.NewRegistry(config)
-	app := reg.NewAppController()
+	app := reg.NewAppController() // app that will contain all controllers with their implementations.
 
 	// Initialize Routing Handling
 	router := router.NewRouter(config, app)

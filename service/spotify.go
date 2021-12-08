@@ -28,11 +28,11 @@ func NewSpotifyService(config model.Config) SpotifyService {
 
 // SearcArtist: Makes a HTTP GET call to Spotify API to search for an Artist Information.
 // This func will return an error (in case that one is triggered).
-func (sp SpotifyService) SearchArtist(artist string, targetArtist *model.Artist) error {
+func (sp SpotifyService) SearchArtist(artist string) (model.Artist, error) {
 	// Get token from Spotify API (Token experies every 30 minutes.)
 	accessToken, err := RefreshToken(sp.config.RefreshEndpoint, sp.config.RefreshToken, sp.config.AuthorizationToken)
 	if err != nil {
-		return spotiferr.ErrTokenMissing
+		return model.Artist{}, spotiferr.ErrTokenMissing
 	}
 
 	spotifyEndpoint := sp.config.SpotifyEndpoint
@@ -47,7 +47,7 @@ func (sp SpotifyService) SearchArtist(artist string, targetArtist *model.Artist)
 	// Create request with URL endpoint, Method and Headers.
 	request, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
-		return spotiferr.ErrBadRequestFormat
+		return model.Artist{}, spotiferr.ErrBadRequestFormat
 	}
 
 	request.Header.Set("Content-Type", "application/json")
@@ -58,13 +58,13 @@ func (sp SpotifyService) SearchArtist(artist string, targetArtist *model.Artist)
 	if err != nil {
 		log.Println("Error:", err)
 
-		return spotiferr.ErrHttpClient
+		return model.Artist{}, spotiferr.ErrHttpClient
 	}
 
 	if response.StatusCode >= 400 {
 		log.Println("Error: ", response)
 
-		return spotiferr.ErrInvalidToken
+		return model.Artist{}, spotiferr.ErrInvalidToken
 	}
 
 	// Close http.Client Response
@@ -73,35 +73,37 @@ func (sp SpotifyService) SearchArtist(artist string, targetArtist *model.Artist)
 	// Read Response Body from HTTP Call
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return spotiferr.ErrResponseError
+		return model.Artist{}, spotiferr.ErrResponseError
 	}
 
 	// Unmarshall JSON is use to MAP the values from body json to the Struct ArtistResponseJSON
 	jsonResponse := model.ArtistResponse{}
 	if err := json.Unmarshal([]byte(string(body)), &jsonResponse); err != nil {
-		return spotiferr.ErrUnmarshallError
+		return model.Artist{}, spotiferr.ErrUnmarshallError
 
 	}
 
+	foundArtist := model.Artist{}
 	// Search through ITEM array (from Response body) and find the Band/artist Name.
 	for _, itemArtist := range jsonResponse.Artists.Items {
-		if strings.ToLower(itemArtist.Name) == strings.ToLower(artist) {
-			targetArtist.ID = itemArtist.SpotifyID
-			targetArtist.Name = itemArtist.Name
-			targetArtist.SpotifyURL = itemArtist.ExternalUrls.Spotify
+		// Validate artist name.
+		if strings.EqualFold(itemArtist.Name, artist) {
+			foundArtist.ID = itemArtist.SpotifyID
+			foundArtist.Name = itemArtist.Name
+			foundArtist.SpotifyURL = itemArtist.ExternalUrls.Spotify
 
 			//  Genres is a []string
 			// []string... Let me pass multiple values to the func append.
-			targetArtist.Genres = append(targetArtist.Genres, itemArtist.Genres...)
+			foundArtist.Genres = append(foundArtist.Genres, itemArtist.Genres...)
 		}
 	}
 
 	// Check if the Artist was found or not.
-	if targetArtist.Name == "" {
-		return spotiferr.ErrArtistNotFound
+	if foundArtist.Name == "" {
+		return model.Artist{}, spotiferr.ErrArtistNotFound
 	}
 
-	return nil
+	return foundArtist, nil
 
 }
 
