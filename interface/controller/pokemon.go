@@ -14,7 +14,7 @@ import (
 
 // Interface to handle usecase/interactor methods for PokemonController.
 type interactorPokemon interface {
-	GetAllPokemons(pokemons *[]model.Pokemon) error
+	GetAllPokemons() ([]model.Pokemon, error)
 	GetPokemon(ID int) (model.Pokemon, error)
 	GetPokemonWorker(t string, items int, itemsPerWorker int) ([]model.Pokemon, error)
 }
@@ -29,8 +29,8 @@ func (pc *PokemonController) GetAllPokemons(res http.ResponseWriter, req *http.R
 	log.Println("HTTP GET /pokemons")
 
 	// Get an array of model.Pokemon from service "ReadCSV".
-	var pokemons []model.Pokemon
-	if err := pc.service.GetAllPokemons(&pokemons); err != nil {
+	pokemons, err := pc.service.GetAllPokemons(); 
+	if err != nil {
 		log.Println("Error: " + err.Error())
 		http.Error(res, err.Error(), http.StatusBadRequest)
 

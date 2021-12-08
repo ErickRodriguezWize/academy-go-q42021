@@ -21,13 +21,15 @@ func NewFileService(config model.Config) FileService {
 	return FileService{config}
 }
 
-// ReadCSV: Reads a .csv file specific path and create an array  with the content of csv file.
-func (fs FileService) ReadAll(pkms *[]model.Pokemon) error {
+// ReadAll: Reads a .csv file specific path and create an array  with the content of csv file.
+func (fs FileService) ReadAll() ([]model.Pokemon, error) {
+	pokemons := []model.Pokemon{}
+
 	// Opening the csv file using the path.
 	path := fs.config.PokemonCsvPath
 	file, err := os.Open(path)
 	if err != nil {
-		return csverr.ErrFileError
+		return pokemons, csverr.ErrFileError
 	}
 
 	// Read the content of the file using the package csv.
@@ -44,25 +46,25 @@ func (fs FileService) ReadAll(pkms *[]model.Pokemon) error {
 				break
 			}
 
-			return csverr.ErrEndOfFile
+			return pokemons, csverr.ErrEndOfFile
 		}
 
 		// Parse validation of ID value (Integer).
 		id, err := strconv.Atoi(record[0])
 
 		if err != nil {
-			return csverr.ErrColumnParseError
+			return pokemons, csverr.ErrColumnParseError
 		}
 
 		// Append to the structured Slice of Pokemons.
-		*pkms = append(*pkms, model.Pokemon{
+		pokemons = append(pokemons, model.Pokemon{
 			ID:   id,
 			Name: record[1],
 		})
 
 	}
 
-	return nil
+	return pokemons, nil
 
 }
 

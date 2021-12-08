@@ -4,12 +4,6 @@ import (
 	"github.com/ErickRodriguezWize/academy-go-q42021/domain/model"
 )
 
-// interface that will handle all file methods for implementacion.
-type iFileService interface {
-	ReadAll(pkms *[]model.Pokemon) error
-	Write(artist model.Artist) error
-}
-
 // interface that will handle all spotify methods for implementacion.
 type iSpotifyService interface {
 	SearchArtist(artist string) (model.Artist, error)
@@ -17,13 +11,13 @@ type iSpotifyService interface {
 
 // Artist Interator struct that will contain all the interfaces.
 type ArtistInteractor struct {
-	fileService    iFileService
+	fileService   iWriteService
 	spotifyService iSpotifyService
 }
 
 // NewArtistInteractor: Construct for ArtistInteractor struct and implement interfaces.
-func NewArtistInteractor(ifs iFileService, isp iSpotifyService) *ArtistInteractor {
-	return &ArtistInteractor{ifs, isp}
+func NewArtistInteractor(iws iWriteService, isp iSpotifyService) *ArtistInteractor {
+	return &ArtistInteractor{iws, isp}
 }
 
 // SearchArtist: Handle use of SearchArtist service
